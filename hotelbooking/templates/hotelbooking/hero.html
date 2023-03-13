@@ -1,30 +1,14 @@
-   {% load static %} 
-    <section class="home-slider owl-carousel">
-      <div class="slider-item" style="background-image:url({% static 'images/bg_1.jpg' %});">
-      	<div class="overlay"></div>
-        <div class="container">
-          <div class="row no-gutters slider-text align-items-center justify-content-center">
-          <div class="col-md-12 ftco-animate text-center">
-          	<div class="text mb-5 pb-3">
-	            <h1 class="mb-3">Welcome To Deluxe</h1>
-	            <h2>Hotels &amp; Resorts</h2>
+   {% load static %}
+   <div class="hero-wrap" style="background-image: url({% static 'images/bg_1.jpg'  %});">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row no-gutters slider-text d-flex align-itemd-end justify-content-center">
+          <div class="col-md-9 ftco-animate text-center d-flex align-items-end justify-content-center">
+          	<div class="text">
+	            <p class="breadcrumbs mb-2"><span class="mr-2"><a href="{% url 'hotelbooking:home' %}">Home</a></span> <span>About</span></p>
+	            <h1 class="mb-4 bread">{{pagename}}</h1>
             </div>
           </div>
         </div>
-        </div>
       </div>
-
-      <div class="slider-item" style="background-image:url({% static 'images/bg_2.jpg' %});">
-      	<div class="overlay"></div>
-        <div class="container">
-          <div class="row no-gutters slider-text align-items-center justify-content-center">
-          <div class="col-md-12 ftco-animate text-center">
-          	<div class="text mb-5 pb-3">
-	            <h1 class="mb-3">Enjoy A Luxury Experience</h1>
-	            <h2>Join With Us</h2>
-            </div>
-          </div>
-        </div>
-        </div>
-      </div>
-    </section>
+    </div>
