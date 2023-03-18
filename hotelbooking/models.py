@@ -34,6 +34,7 @@ class Room(BaseModel):
     room_view = models.ManyToManyField(Room_view)
     room_bed = models.IntegerField(default=1)
     room_image = models.ImageField(upload_to=None, height_field=None, width_field=None, max_length=None)
+    
     def __str__(self):
         return self.room_name
 
@@ -53,3 +54,13 @@ class Package(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class Booking(BaseModel):
+    start_date = models.DateField()
+    end_date = models.DateField()
+    room= models.ForeignKey(Room, on_delete=models.CASCADE)
+    guest_name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.room.room_name
