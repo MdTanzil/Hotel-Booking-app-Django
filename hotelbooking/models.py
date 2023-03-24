@@ -14,6 +14,9 @@ class Room_category(BaseModel):
     desc = models.TextField()
     def __str__(self):
         return self.name
+    class Meta:
+        ordering = ['id']
+
     
 
 class Room_view(BaseModel):
@@ -64,3 +67,8 @@ class Booking(BaseModel):
     
     def __str__(self):
         return self.room.room_name
+
+class Package_Booking(BaseModel):
+    package = models.ForeignKey(Package, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=50)
