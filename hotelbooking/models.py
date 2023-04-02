@@ -62,9 +62,10 @@ class Package(BaseModel):
 class Booking(BaseModel):
     start_date = models.DateField()
     end_date = models.DateField()
-    room= models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     guest_name = models.CharField(max_length=100)
-    
+    phone_number = models.CharField(max_length=15)
+
     def __str__(self):
         return self.room.room_name
 
@@ -72,3 +73,30 @@ class Package_Booking(BaseModel):
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=50)
+
+
+class Guest(BaseModel):
+    guest_name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    date_of_birth = models.DateField()
+    nid_number = models.IntegerField(default=0)
+    passport = models.CharField(max_length=15)
+    permanent_address = models.TextField(blank=True)
+    post_code = models.CharField(max_length=5)
+    
+    def __str__(self):
+        return self.guest_name
+    
+
+
+class Lead(BaseModel):
+    start_date = models.DateField()
+    end_date = models.DateField()
+    adult_member = models.IntegerField(default=1)
+    child = models.IntegerField(default=0)
+    room_01 = models.ForeignKey(Room, on_delete=models.CASCADE, related_name ='room_01')
+    room_02 = models.ForeignKey(
+        Room, on_delete=models.CASCADE, blank=True, null=True, related_name = 'room_02')
+    room_03 = models.ForeignKey(
+        Room, on_delete=models.CASCADE, blank=True, null=True, related_name='room_03')
+    guest = models.ManyToManyField(Guest)

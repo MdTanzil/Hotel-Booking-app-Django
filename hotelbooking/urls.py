@@ -8,7 +8,6 @@ urlpatterns = [
     path('package/', PackageTemplate.as_view(), name='packages'),
     path('details-room/<str:pk>', RoomDetails.as_view(), name='details-room'),
     path('booking-room/<str:pk>', CreateBookingRoom.as_view(), name='booking-room'),
-    path('booking-package/<str:pk>',
-         PackageBookingCreateView.as_view(), name='booking-package'),
+    path('booking-package/<str:pk>', PackageBookingCreateView.as_view(), name='booking-package'),
     
 ]

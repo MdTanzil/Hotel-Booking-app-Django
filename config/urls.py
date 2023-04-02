@@ -25,6 +25,7 @@ from hotelbooking import urls as hotelbooking_url
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(hotelbooking_url)),
+    path('accounts/', include('allauth.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

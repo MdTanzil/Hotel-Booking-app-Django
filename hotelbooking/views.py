@@ -6,7 +6,8 @@ from django.views.generic import TemplateView, ListView, CreateView
 from . models import Room, Package, Booking, Room_category,Package_Booking
 from django.db.models import Q
 from .form import BookingForm ,PackageBookingForm
-
+from django.shortcuts import redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 
@@ -41,6 +42,7 @@ class RoomsTemplate(View):
         
     def post(self,request):
         template_name = "hotelbooking/rooms.html"
+        context ={}
         try: 
             start_date = request.POST.get('start_date')
             end_date = request.POST.get('end_date')
@@ -67,9 +69,24 @@ class PackageTemplate(ListView):
     context_object_name = 'packages'
     queryset = Package.objects.all().filter(active=True)
     
-class RoomDetails(TemplateView):
+
+class RoomDetails(LoginRequiredMixin, TemplateView):
    
     def get(self,request,pk):
+        try:
+            if request.GET:
+                if request.GET.get("choice") == "booking":
+                    return redirect(f"/booking-room/{pk}")
+                elif request.GET.get("choice") == "confirm_booking":
+                    return redirect(f"/booking-room/{pk}")
+                else:
+                    pass
+                
+            
+        except:
+            pass
+
+            
         
         room = Room.objects.get(id = pk)
         template_name = "hotelbooking/rooms-single.html"
@@ -79,7 +96,7 @@ class RoomDetails(TemplateView):
         return render(request, template_name, context)
 
 
-class CreateBookingRoom(View):
+class CreateBookingRoom(LoginRequiredMixin,View ):
     def get(self, request, pk):
         id=pk
         form = BookingForm()
@@ -98,7 +115,7 @@ class CreateBookingRoom(View):
         return render(request, 'hotelbooking/rooms.html')
 
 
-class PackageBookingCreateView(View):
+class PackageBookingCreateView(LoginRequiredMixin, View):
     def get(self, request, pk):
         id = pk
         form = PackageBookingForm()

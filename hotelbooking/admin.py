@@ -1,6 +1,6 @@
 from django.contrib import admin
-from . models import Room_category, Room_view, Room, Package_item, Package, Booking,Package_Booking
-
+from . models import (Room_category, Room_view, Room, Package_item, Package, Booking,Package_Booking
+,Guest,Lead)
 # Register your models here.
 class Room_categoryAdmin(admin.ModelAdmin):
     list_display = ('id','name', 'desc')
@@ -32,6 +32,16 @@ class BookingAdmin(admin.ModelAdmin):
 class BookingAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'phone_number')
 
+
+@admin.register(Guest)
+class GuestAdmin(admin.ModelAdmin):
+    list_display = ('guest_name', 'phone_number',
+                    'nid_number', 'permanent_address')
+
+
+@admin.register(Lead)
+class LeadAdmin(admin.ModelAdmin):
+    pass
 
 
 
