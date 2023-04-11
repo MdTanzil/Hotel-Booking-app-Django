@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.shortcuts import redirect
 from datetime import datetime, date, timedelta
 from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView
@@ -8,7 +7,13 @@ from django.db.models import Q
 from .form import BookingForm ,PackageBookingForm
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+from sslcommerz_lib import SSLCOMMERZ
+from decimal import Decimal
 # Create your views here.
+
+
+
+
 
 
 class HomeTemplate(TemplateView):
@@ -78,7 +83,32 @@ class RoomDetails(LoginRequiredMixin, TemplateView):
                 if request.GET.get("choice") == "booking":
                     return redirect(f"/booking-room/{pk}")
                 elif request.GET.get("choice") == "confirm_booking":
-                    return redirect(f"/booking-room/{pk}")
+                    settings = {'store_id': 'adfa6429b57187712',
+                                'store_pass': 'adfa6429b57187712@ssl', 'issandbox': True}
+                    sslcz = SSLCOMMERZ(settings)
+                    post_body = {}
+                    post_body['total_amount'] = 100.26
+                    post_body['currency'] = "BDT"
+                    post_body['tran_id'] = "12345"
+                    post_body['success_url'] = "your success url"
+                    post_body['fail_url'] = "your fail url"
+                    post_body['cancel_url'] = "your cancel url"
+                    post_body['emi_option'] = 0
+                    post_body['cus_name'] = "test"
+                    post_body['cus_email'] = "test@test.com"
+                    post_body['cus_phone'] = "01700000000"
+                    post_body['cus_add1'] = "customer address"
+                    post_body['cus_city'] = "Dhaka"
+                    post_body['cus_country'] = "Bangladesh"
+                    post_body['shipping_method'] = "NO"
+                    post_body['multi_card_name'] = ""
+                    post_body['num_of_item'] = 1
+                    post_body['product_name'] = "Test"
+                    post_body['product_category'] = "Test Category"
+                    post_body['product_profile'] = "general"
+                    response = sslcz.createSession(post_body)
+                    print(response)
+                    return redirect(f"{response['GatewayPageURL']}")
                 else:
                     pass
                 
