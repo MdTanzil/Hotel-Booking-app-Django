@@ -26,10 +26,12 @@ class PackageAdmin(admin.ModelAdmin):
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display =('guest_name','room','start_date','end_date')
+    list_filter = ('created_at',)
+    search_fields = ['guest_name', 'phone_number']
     
 
 @admin.register(Package_Booking)
-class BookingAdmin(admin.ModelAdmin):
+class PackageBookingAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'phone_number')
 
 
@@ -47,3 +49,4 @@ class LeadAdmin(admin.ModelAdmin):
 
 admin.site.register(Room_category,Room_categoryAdmin)
 admin.site.register(Package_item)
+

@@ -78,6 +78,7 @@ class PackageTemplate(ListView):
 class RoomDetails(LoginRequiredMixin, TemplateView):
    
     def get(self,request,pk):
+        room = Room.objects.get(id = pk)
         try:
             if request.GET:
                 if request.GET.get("choice") == "booking":
@@ -87,10 +88,10 @@ class RoomDetails(LoginRequiredMixin, TemplateView):
                                 'store_pass': 'adfa6429b57187712@ssl', 'issandbox': True}
                     sslcz = SSLCOMMERZ(settings)
                     post_body = {}
-                    post_body['total_amount'] = 100.26
+                    post_body['total_amount'] = room.room_price
                     post_body['currency'] = "BDT"
                     post_body['tran_id'] = "12345"
-                    post_body['success_url'] = "your success url"
+                    post_body['success_url'] = ""
                     post_body['fail_url'] = "your fail url"
                     post_body['cancel_url'] = "your cancel url"
                     post_body['emi_option'] = 0

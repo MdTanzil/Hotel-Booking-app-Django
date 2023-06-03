@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -175,3 +176,9 @@ AUTHENTICATION_BACKENDS = (
 
 
 LOGIN_URL ='/accounts/login/'
+
+JAZZMIN_SETTINGS ={
+    "site_title": "Hotel Booking",
+    "site_header": "Hotel Booking",
+
+}
