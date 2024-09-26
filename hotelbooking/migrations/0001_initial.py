@@ -9,87 +9,146 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Package_item',
+            name="Package_item",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('active', models.BooleanField(blank=True, default=True)),
-                ('item_name', models.CharField(max_length=50)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("active", models.BooleanField(blank=True, default=True)),
+                ("item_name", models.CharField(max_length=50)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Room_category',
+            name="Room_category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('active', models.BooleanField(blank=True, default=True)),
-                ('name', models.CharField(max_length=100)),
-                ('desc', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("active", models.BooleanField(blank=True, default=True)),
+                ("name", models.CharField(max_length=100)),
+                ("desc", models.TextField()),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Room_view',
+            name="Room_view",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('active', models.BooleanField(blank=True, default=True)),
-                ('name', models.CharField(max_length=100)),
-                ('desc', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("active", models.BooleanField(blank=True, default=True)),
+                ("name", models.CharField(max_length=100)),
+                ("desc", models.TextField()),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Room',
+            name="Room",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('active', models.BooleanField(blank=True, default=True)),
-                ('room_name', models.CharField(max_length=50)),
-                ('room_price', models.FloatField(default=0)),
-                ('max_person', models.IntegerField(default=1)),
-                ('room_size', models.IntegerField()),
-                ('room_desc', models.TextField()),
-                ('room_bed', models.IntegerField(default=1)),
-                ('room_image', models.ImageField(upload_to=None)),
-                ('room_category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='hotelbooking.room_category')),
-                ('room_view', models.ManyToManyField(to='hotelbooking.room_view')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("active", models.BooleanField(blank=True, default=True)),
+                ("room_name", models.CharField(max_length=50)),
+                ("room_price", models.FloatField(default=0)),
+                ("max_person", models.IntegerField(default=1)),
+                ("room_size", models.IntegerField()),
+                ("room_desc", models.TextField()),
+                ("room_bed", models.IntegerField(default=1)),
+                ("room_image", models.ImageField(upload_to=None)),
+                (
+                    "room_category",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="hotelbooking.room_category",
+                    ),
+                ),
+                ("room_view", models.ManyToManyField(to="hotelbooking.room_view")),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Package',
+            name="Package",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('active', models.BooleanField(blank=True, default=True)),
-                ('name', models.CharField(max_length=50)),
-                ('price', models.IntegerField(default=100)),
-                ('package_image', models.ImageField(upload_to=None, verbose_name=hotelbooking.models.Room)),
-                ('package_item', models.ManyToManyField(to='hotelbooking.package_item')),
-                ('room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='hotelbooking.room')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("active", models.BooleanField(blank=True, default=True)),
+                ("name", models.CharField(max_length=50)),
+                ("price", models.IntegerField(default=100)),
+                (
+                    "package_image",
+                    models.ImageField(
+                        upload_to=None, verbose_name=hotelbooking.models.Room
+                    ),
+                ),
+                (
+                    "package_item",
+                    models.ManyToManyField(to="hotelbooking.package_item"),
+                ),
+                (
+                    "room",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="hotelbooking.room",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

@@ -7,47 +7,88 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hotelbooking', '0004_booking_phone_number'),
+        ("hotelbooking", "0004_booking_phone_number"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Guest',
+            name="Guest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('active', models.BooleanField(blank=True, default=True)),
-                ('guest_name', models.CharField(max_length=100)),
-                ('phone_number', models.CharField(max_length=15)),
-                ('date_of_birth', models.DateField()),
-                ('nid_number', models.IntegerField(default=0)),
-                ('passport', models.CharField(max_length=15)),
-                ('permanent_address', models.TextField(blank=True)),
-                ('post_code', models.CharField(max_length=5)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("active", models.BooleanField(blank=True, default=True)),
+                ("guest_name", models.CharField(max_length=100)),
+                ("phone_number", models.CharField(max_length=15)),
+                ("date_of_birth", models.DateField()),
+                ("nid_number", models.IntegerField(default=0)),
+                ("passport", models.CharField(max_length=15)),
+                ("permanent_address", models.TextField(blank=True)),
+                ("post_code", models.CharField(max_length=5)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Lead',
+            name="Lead",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('active', models.BooleanField(blank=True, default=True)),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField()),
-                ('adult_member', models.IntegerField(default=1)),
-                ('child', models.IntegerField(default=0)),
-                ('guest', models.ManyToManyField(to='hotelbooking.guest')),
-                ('room_01', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='room_01', to='hotelbooking.room')),
-                ('room_02', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='room_02', to='hotelbooking.room')),
-                ('room_03', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='room_03', to='hotelbooking.room')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("active", models.BooleanField(blank=True, default=True)),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField()),
+                ("adult_member", models.IntegerField(default=1)),
+                ("child", models.IntegerField(default=0)),
+                ("guest", models.ManyToManyField(to="hotelbooking.guest")),
+                (
+                    "room_01",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="room_01",
+                        to="hotelbooking.room",
+                    ),
+                ),
+                (
+                    "room_02",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="room_02",
+                        to="hotelbooking.room",
+                    ),
+                ),
+                (
+                    "room_03",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="room_03",
+                        to="hotelbooking.room",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]
