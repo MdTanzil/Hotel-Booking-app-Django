@@ -1,141 +1,174 @@
 {% extends 'base.html' %}
 {% load static %}
-
-
 {% block title %}
-    Rooms Detais
+  Rooms Detais
 {% endblock title %}
-
 {% block body %}
-{% include 'hotelbooking/hero.html' with pagename="Rooms Details" %}
-    <section class="ftco-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-8">
-          	<div class="row">
-          		<div class="col-md-12 ftco-animate">
-          			<h2 class="mb-4">{{room.room_category}}</h2>
-          			<div class="single-slider owl-carousel">
-          				<div class="item">
-          					<div class="room-img" style="background-image: url({{room.room_image.url}});"></div>
-          				</div>
-          				<div class="item">
-          					<div class="room-img" style="background-image: url({{room.room_image.url}});"></div>
-          				</div>
-          				<div class="item">
-          					<div class="room-img" style="background-image: url({{room.room_image.url}});"></div>
-          				</div>
-          			</div>
-          		</div>
-          		<div class="col-md-12 room-single mt-4 mb-5 ftco-animate">
-    						<p>{{room.room_desc}}</p>
-    						<div class="d-md-flex mt-5 mb-5">
-    							<ul class="list">
-	    							<li><span>Max:</span> {{room.max_person}} Persons</li>
-	    							<li><span>Size:</span> {{room.room_size}} m2</li>
-	    						</ul>
-	    						<ul class="list ml-md-5">
-	    							<li><span>View:</span> {% for view in room.room_view.all %} {{view}} | {% endfor %}</li>
-	    							<li><span>Bed:</span> {{room.room_bed}}</li>
-	    						</ul>
-    						</div>
-    						<p>When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek, then she continued her way.</p>
-          		</div>
-
-          	</div>
-          </div> <!-- .col-md-8 -->
-          <div class="col-lg-4 sidebar ftco-animate">
-            <div class="sidebar-box">
-              <form action="" method="GET"  class="search-form">
-                
-                <div class="form-group">
-                  <span class="icon fa fa-search"></span>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="choice" id="exampleRadios1" value="booking">
-                    <label class="form-check-label" for="exampleRadios1">
-                      Booking
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="choice" id="exampleRadios2" value="confirm_booking">
-                    <label class="form-check-label" for="exampleRadios2">
-                      Confirm Booking
-                    </label>
-                  </div>
-                  <button type="submit" class="btn btn-primary mt-1">continue</button>
-
-
-
-
-
+  {% include 'hotelbooking/hero.html' with pagename="Rooms Details" %}
+  <section class="ftco-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="row">
+            <div class="col-md-12 ftco-animate">
+              <h2 class="mb-4">{{ room.room_category }}</h2>
+              <div class="single-slider owl-carousel">
+                <div class="item">
+                  <div class="room-img"
+                       style="background-image: url({{ room.room_image.url }})"></div>
                 </div>
-              </form>
-            </div>
-            <div class="sidebar-box ftco-animate">
-              <div class="categories">
-                <h3>Categories</h3>
-                <li><a href="#">Properties <span>(12)</span></a></li>
-                <li><a href="#">Home <span>(22)</span></a></li>
-                <li><a href="#">House <span>(37)</span></a></li>
-                <li><a href="#">Villa <span>(42)</span></a></li>
-                <li><a href="#">Apartment <span>(14)</span></a></li>
-                <li><a href="#">Condominium <span>(140)</span></a></li>
+                <div class="item">
+                  <div class="room-img"
+                       style="background-image: url({{ room.room_image.url }})"></div>
+                </div>
+                <div class="item">
+                  <div class="room-img"
+                       style="background-image: url({{ room.room_image.url }})"></div>
+                </div>
               </div>
             </div>
-
+            <div class="col-md-12 room-single mt-4 mb-5 ftco-animate">
+              <p>{{ room.room_desc }}</p>
+              <div class="d-md-flex mt-5 mb-5">
+                <ul class="list">
+                  <li>
+                    <span>Max:</span> {{ room.max_person }} Persons
+                  </li>
+                  <li>
+                    <span>Size:</span> {{ room.room_size }} m2
+                  </li>
+                </ul>
+                <ul class="list ml-md-5">
+                  <li>
+                    <span>View:</span>
+                    {% for view in room.room_view.all %}{{ view }} |{% endfor %}
+                  </li>
+                  <li>
+                    <span>Bed:</span> {{ room.room_bed }}
+                  </li>
+                </ul>
+              </div>
+              <p>
+                When she reached the first hills of the Italic Mountains, she had
+                a last view back on the skyline of her hometown Bookmarksgrove,
+                the headline of Alphabet Village and the subline of her own road,
+                the Line Lane. Pityful a rethoric question ran over her cheek,
+                then she continued her way.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- .col-md-8 -->
+        <div class="col-lg-4 sidebar ftco-animate">
+          <div class="sidebar-box">
+            <form action="" method="GET" class="search-form">
+              <div class="form-group">
+                <span class="icon fa fa-search"></span>
+                <div class="form-check">
+                  <input class="form-check-input"
+                         type="radio"
+                         name="choice"
+                         id="exampleRadios1"
+                         value="booking" />
+                  <label class="form-check-label" for="exampleRadios1">Booking</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input"
+                         type="radio"
+                         name="choice"
+                         id="exampleRadios2"
+                         value="confirm_booking" />
+                  <label class="form-check-label" for="exampleRadios2">Confirm Booking</label>
+                </div>
+                <button type="submit" class="btn btn-primary mt-1">continue</button>
+              </div>
+            </form>
+          </div>
+          <div class="sidebar-box ftco-animate">
+            <div class="categories">
+              <h3>Categories</h3>
+              <li>
+                <a href="#">Properties <span>(12)</span></a>
+              </li>
+              <li>
+                <a href="#">Home <span>(22)</span></a>
+              </li>
+              <li>
+                <a href="#">House <span>(37)</span></a>
+              </li>
+              <li>
+                <a href="#">Villa <span>(42)</span></a>
+              </li>
+              <li>
+                <a href="#">Apartment <span>(14)</span></a>
+              </li>
+              <li>
+                <a href="#">Condominium <span>(140)</span></a>
+              </li>
+            </div>
           </div>
         </div>
       </div>
-    </section> <!-- .section -->
-
-
-    <section class="instagram pt-5">
-      <div class="container-fluid">
-        <div class="row no-gutters justify-content-center pb-5">
-          <div class="col-md-7 text-center heading-section ftco-animate">
-            <h2><span>Instagram</span></h2>
-          </div>
-        </div>
-        <div class="row no-gutters">
-          <div class="col-sm-12 col-md ftco-animate">
-            <a href="images/insta-1.jpg" class="insta-img image-popup" style="background-image: url(images/insta-1.jpg);">
-              <div class="icon d-flex justify-content-center">
-                <span class="icon-instagram align-self-center"></span>
-              </div>
-            </a>
-          </div>
-          <div class="col-sm-12 col-md ftco-animate">
-            <a href="images/insta-2.jpg" class="insta-img image-popup" style="background-image: url(images/insta-2.jpg);">
-              <div class="icon d-flex justify-content-center">
-                <span class="icon-instagram align-self-center"></span>
-              </div>
-            </a>
-          </div>
-          <div class="col-sm-12 col-md ftco-animate">
-            <a href="images/insta-3.jpg" class="insta-img image-popup" style="background-image: url(images/insta-3.jpg);">
-              <div class="icon d-flex justify-content-center">
-                <span class="icon-instagram align-self-center"></span>
-              </div>
-            </a>
-          </div>
-          <div class="col-sm-12 col-md ftco-animate">
-            <a href="images/insta-4.jpg" class="insta-img image-popup" style="background-image: url(images/insta-4.jpg);">
-              <div class="icon d-flex justify-content-center">
-                <span class="icon-instagram align-self-center"></span>
-              </div>
-            </a>
-          </div>
-          <div class="col-sm-12 col-md ftco-animate">
-            <a href="images/insta-5.jpg" class="insta-img image-popup" style="background-image: url(images/insta-5.jpg);">
-              <div class="icon d-flex justify-content-center">
-                <span class="icon-instagram align-self-center"></span>
-              </div>
-            </a>
-          </div>
+    </div>
+  </section>
+  <!-- .section -->
+  <section class="instagram pt-5">
+    <div class="container-fluid">
+      <div class="row no-gutters justify-content-center pb-5">
+        <div class="col-md-7 text-center heading-section ftco-animate">
+          <h2>
+            <span>Instagram</span>
+          </h2>
         </div>
       </div>
-    </section>
-
-   
-{% include 'footer.html' %}
+      <div class="row no-gutters">
+        <div class="col-sm-12 col-md ftco-animate">
+          <a href="images/insta-1.jpg"
+             class="insta-img image-popup"
+             style="background-image: url(images/insta-1.jpg)">
+            <div class="icon d-flex justify-content-center">
+              <span class="icon-instagram align-self-center"></span>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-12 col-md ftco-animate">
+          <a href="images/insta-2.jpg"
+             class="insta-img image-popup"
+             style="background-image: url(images/insta-2.jpg)">
+            <div class="icon d-flex justify-content-center">
+              <span class="icon-instagram align-self-center"></span>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-12 col-md ftco-animate">
+          <a href="images/insta-3.jpg"
+             class="insta-img image-popup"
+             style="background-image: url(images/insta-3.jpg)">
+            <div class="icon d-flex justify-content-center">
+              <span class="icon-instagram align-self-center"></span>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-12 col-md ftco-animate">
+          <a href="images/insta-4.jpg"
+             class="insta-img image-popup"
+             style="background-image: url(images/insta-4.jpg)">
+            <div class="icon d-flex justify-content-center">
+              <span class="icon-instagram align-self-center"></span>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-12 col-md ftco-animate">
+          <a href="images/insta-5.jpg"
+             class="insta-img image-popup"
+             style="background-image: url(images/insta-5.jpg)">
+            <div class="icon d-flex justify-content-center">
+              <span class="icon-instagram align-self-center"></span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% include 'footer.html' %}
 {% endblock body %}

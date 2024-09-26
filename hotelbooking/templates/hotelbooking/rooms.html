@@ -1,123 +1,135 @@
 {% extends 'base.html' %}
 {% load static %}
-
-
 {% block title %}
     Rooms
 {% endblock title %}
-    
-
 {% block body %}
     {% include 'hotelbooking/hero.html' with pagename="Rooms" %}
-
-
-
-
-       <section class="ftco-section bg-light">
-		<div class="container">
-			<div class="row">
-				<h1>ALL Rooms</h1>
+    <section class="ftco-section bg-light">
+        <div class="container">
+            <div class="row">
+                <col-8>
+                <h1>Available Rooms</h1>
+            </col-8>
+        </div>
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="row">
+                    {% if rooms %}
+                        {% for room  in rooms %}
+                            <div class="col-sm col-md-6 col-lg-4 ftco-animate">
+                                <div class="room">
+                                    {{ MEDIA_URL }}
+                                    <a href="{% url 'hotelbooking:details-room' room.id %} "
+                                       class="img d-flex justify-content-center align-items-center"
+                                       style="background-image: url({{ room.room_image.url }})">
+                                        <div class="icon d-flex justify-content-center align-items-center">
+                                            <span class="icon-search2"></span>
+                                        </div>
+                                    </a>
+                                    <div class="text p-3 text-center">
+                                        <h3 class="mb-3">
+                                            <a href="{% url 'hotelbooking:details-room' room.id %} ">{{ room.room_name }}</a>
+                                        </h3>
+                                        <p>
+                                            <span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>
+                                        </p>
+                                        <ul class="list">
+                                            <li>
+                                                <span>Max:</span> {{ room.max_person }}
+                                            </li>
+                                            <li>
+                                                <span>Size:</span> {{ room.room_size }}
+                                            </li>
+                                            <li>
+                                                <span>View:</span>
+                                                {% for view in room.room_view.all %}{{ view }} <span></span>{% endfor %}
+                                            </li>
+                                            <li>
+                                                <span>Bed:</span> {{ room.room_bed }}
+                                            </li>
+                                        </ul>
+                                        <hr>
+                                        <p class="pt-1">
+                                            <a href="{% url 'hotelbooking:details-room' room.id %}"
+                                               class="btn-custom">Details<span class="icon-long-arrow-right"></span></a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class ='col-sm-6 col-md-6 col-lg-4'>
+                        <div class="bold p-5">Dont have any data</div>
+                    </div>
+                {% endif %}
+            </div>
+			<div class="col-lg-3">
+				{% if rooms %}
+					{% include 'hotelbooking/searchbar.html' %}
+				{% endif %}
 			</div>
-			<div class="row">
-				<div class="col-lg-9">
-					
-		    		<div class="row">
-						
-						{% if all_rooms %}
-							{% for room  in all_rooms %}
-									<div class="col-sm col-md-6 col-lg-4 ftco-animate">
-										<div class="room">
-											<a href="{% url 'hotelbooking:details-room' room.id %} " class="img d-flex justify-content-center align-items-center" style="background-image: url({{room.room_image.url}});">
-												<div class="icon d-flex justify-content-center align-items-center">
-													<span class="icon-search2"></span>
-												</div>
-											</a>
-											<div class="text p-3 text-center">
-											<h3 class="mb-3"><a href="{% url 'hotelbooking:details-room' room.id %} ">{{room.room_category}}</a></h3>
-											<p><span class="price mr-2">${{room.room_price}}</span> <span class="per">per night</span></p>
-											<ul class="list">
-											<li><span>Max:</span> {{room.max_person}}</li>
-											<li><span>Size:</span> {{room.room_size}}</li>
-											<li><span>View:</span>{% for view in room.room_view.all %}{{view}} <span> </span> {% endfor %}</li>
-											<li><span>Bed:</span> {{room.room_bed}}</li>
-											</ul>
-											<hr>
-											<p class="pt-1"><a href="{% url 'hotelbooking:details-room' room.id %}" class="btn-custom">Details<span class="icon-long-arrow-right"></span></a></p>
-											</div>
-										</div>
-									</div>
-							{% endfor %}
-							
-							
-							</div>
-							
-						{% else %}
-						<div class ='col-sm-6 col-md-6 col-lg-4'>
-							<div class="bold p-5">Dont have any data</div>
-						</div>
-							
-						{% endif %}
-							
-		    			
-		    		</div>
-					<div class="col-lg-3">
-						{% include 'hotelbooking/searchbar.html' %}
-					</div>
-		    	</div>
-		</div>
-    	<div class="container">
-			<div class="row">
-				<col-8><h1>Available Rooms</h1></col-8>
-			</div>
-
-    		<div class="row">
-	        <div class="col-lg-9">
-					
-		    		<div class="row">
-						
-						{% if rooms %}
-							{% for room  in rooms %}
-									<div class="col-sm col-md-6 col-lg-4 ftco-animate">
-										<div class="room">{{ MEDIA_URL }} 
-											<a href="{% url 'hotelbooking:details-room' room.id %} " class="img d-flex justify-content-center align-items-center" style="background-image: url({{room.room_image.url}});">
-												<div class="icon d-flex justify-content-center align-items-center">
-													<span class="icon-search2"></span>
-												</div>
-											</a>
-											<div class="text p-3 text-center">
-											<h3 class="mb-3"><a href="{% url 'hotelbooking:details-room' room.id %} ">{{room.room_category}}</a></h3>
-											<p><span class="price mr-2">${{room.room_price}}</span> <span class="per">per night</span></p>
-											<ul class="list">
-											<li><span>Max:</span> {{room.max_person}}</li>
-											<li><span>Size:</span> {{room.room_size}}</li>
-											<li><span>View:</span>{% for view in room.room_view.all %}{{view}} <span> </span> {% endfor %}</li>
-											<li><span>Bed:</span> {{room.room_bed}}</li>
-											</ul>
-											<hr>
-											<p class="pt-1"><a href="{% url 'hotelbooking:details-room' room.id %}" class="btn-custom">Details<span class="icon-long-arrow-right"></span></a></p>
-											</div>
-										</div>
-									</div>
-							{% endfor %}
-							
-							
-							</div>
-							
-						{% else %}
-						<div class ='col-sm-6 col-md-6 col-lg-4'>
-							<div class="bold p-5">Dont have any data</div>
-						</div>
-							
-						{% endif %}
-							
-		    			
-		    		
-		    	</div>
-
-		    </div>
-    	</div>
-    </section>
-
-    
+        </div>
+    </div>
+<div class="container">
+    <div class="row">
+        <h1>ALL Rooms</h1>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                {% if all_rooms %}
+                    {% for room  in all_rooms %}
+                        <div class="col-sm col-md-4 col-lg-3 ftco-animate">
+                            <div class="room">
+                                <a href="{% url 'hotelbooking:details-room' room.id %} "
+                                   class="img d-flex justify-content-center align-items-center"
+                                   style="background-image: url({{ room.room_image.url }})">
+                                    <div class="icon d-flex justify-content-center align-items-center">
+                                        <span class="icon-search2"></span>
+                                    </div>
+                                </a>
+                                <div class="text p-3 text-center">
+                                    <h3 class="mb-3">
+                                        <a href="{% url 'hotelbooking:details-room' room.id %} ">{{ room.room_category }}</a>
+                                    </h3>
+                                    <p>
+                                        <span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>
+                                    </p>
+                                    <ul class="list">
+                                        <li>
+                                            <span>Max:</span> {{ room.max_person }}
+                                        </li>
+                                        <li>
+                                            <span>Size:</span> {{ room.room_size }}
+                                        </li>
+                                        <li>
+                                            <span>View:</span>
+                                            {% for view in room.room_view.all %}{{ view }} <span></span>{% endfor %}
+                                        </li>
+                                        <li>
+                                            <span>Bed:</span> {{ room.room_bed }}
+                                        </li>
+                                    </ul>
+                                    <hr>
+                                    <p class="pt-1">
+                                        <a href="{% url 'hotelbooking:details-room' room.id %}"
+                                           class="btn-custom">Details<span class="icon-long-arrow-right"></span></a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class ='col-sm-6 col-md-6 col-lg-4'>
+                    <div class="bold p-5">Dont have any data</div>
+                </div>
+            {% endif %}
+        </div>
+        
+    </div>
+</div>
+</section>
 {% endblock body %}
-    
