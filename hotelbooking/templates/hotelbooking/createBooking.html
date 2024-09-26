@@ -8,11 +8,23 @@
     {% include 'hotelbooking/hero.html' with pagename="Booking" %}
     <div class="container">
         <div class="row">
-            <div class="col-md-8">
+            <div class="heading-section heading-section-wo-line pt-md-5 pl-md-5 mb-5 col-md-12">
+                <div class="ml-md-0">
+                    <span class="subheading">Our team will call you for confirmation</span>
+                    <h2 class="mb-4 text-center">Booking Form</h2>
+                </div>
+            </div>
+        </div>
+       
+        <div class="row">
+            <div class="col-md-12">
                 <form action="" method="post">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <button type="submit" class ="btn btn-primary">Booking</button>
+                    <div class="pb-4 mb-6 mt-3 mb-4">
+                        <button type="submit" class ="btn btn-primary rounded-0 ">Booking</button>
+
+                    </div>
                 </form>
             </div>
         </div>

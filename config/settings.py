@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'ckeditor',
+    'ckeditor_uploader',
     "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -114,6 +117,9 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+# Set STATIC_ROOT to an absolute path where collectstatic will collect static files
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
@@ -172,3 +178,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "Hotel Booking",
     "site_header": "Hotel Booking",
 }
+
+
+# CKEditor Settings
+CKEDITOR_UPLOAD_PATH = 'uploads/'

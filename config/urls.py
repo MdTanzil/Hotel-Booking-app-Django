@@ -26,6 +26,7 @@ from hotelbooking import urls as hotelbooking_url
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include(hotelbooking_url)),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
     path("accounts/", include("allauth.urls")),
 ]
 if settings.DEBUG:

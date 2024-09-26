@@ -11,7 +11,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-5 p-md-5 img img-2 d-flex justify-content-center align-items-center"
-                         style="background-image: url(images/bg_2.jpg)">
+                         style="background-image: url({% static 'images/bg_2.jpg' %})" >
                         <a href="https://vimeo.com/45830194"
                            class="icon popup-vimeo d-flex justify-content-center align-items-center">
                             <span class="icon-play"></span>
@@ -119,7 +119,7 @@
 				{% for room in rooms %}
 					<div class="col-sm col-md-6 col-lg-4 ftco-animate">
                         <div class="room">
-                            <a href="rooms.html"
+                            <a href="{% url 'hotelbooking:details-room' room.id %} " 
                                class="img d-flex justify-content-center align-items-center"
                                style="background-image: url({{room.room_image.url}}">
                                 <div class="icon d-flex justify-content-center align-items-center">
@@ -190,6 +190,7 @@
                 </div>
             </div>
         </section>
+		<!-- review  start -->
         <section class="ftco-section testimony-section bg-light">
             <div class="container">
                 <div class="row justify-content-center">
@@ -200,7 +201,7 @@
                                     <div class="item">
                                         <div class="testimony-wrap py-4 pb-5">
                                             <div class="user-img mb-4"
-                                                 style="background-image: url(images/person_1.jpg)">
+                                                 style="background-image: url({% static 'images/person_1.jpg' %})" >
                                                 <span class="quote d-flex align-items-center justify-content-center">
                                                     <i class="icon-quote-left"></i>
                                                 </span>
@@ -217,7 +218,7 @@
                                     <div class="item">
                                         <div class="testimony-wrap py-4 pb-5">
                                             <div class="user-img mb-4"
-                                                 style="background-image: url(images/person_2.jpg)">
+                                                 style="background-image: url({% static 'images/person_2.jpg' %})">
                                                 <span class="quote d-flex align-items-center justify-content-center">
                                                     <i class="icon-quote-left"></i>
                                                 </span>
@@ -234,7 +235,7 @@
                                     <div class="item">
                                         <div class="testimony-wrap py-4 pb-5">
                                             <div class="user-img mb-4"
-                                                 style="background-image: url(images/person_3.jpg)">
+                                                 style="background-image: url({% static 'images/person_3.jpg' %})">
                                                 <span class="quote d-flex align-items-center justify-content-center">
                                                     <i class="icon-quote-left"></i>
                                                 </span>
@@ -251,7 +252,7 @@
                                     <div class="item">
                                         <div class="testimony-wrap py-4 pb-5">
                                             <div class="user-img mb-4"
-                                                 style="background-image: url(images/person_1.jpg)">
+                                                 style="background-image: url({% static 'images/person_1.jpg' %})">
                                                 <span class="quote d-flex align-items-center justify-content-center">
                                                     <i class="icon-quote-left"></i>
                                                 </span>
@@ -268,7 +269,7 @@
                                     <div class="item">
                                         <div class="testimony-wrap py-4 pb-5">
                                             <div class="user-img mb-4"
-                                                 style="background-image: url(images/person_1.jpg)">
+                                                 style="background-image: url({% static 'images/person_1.jpg' %})">
                                                 <span class="quote d-flex align-items-center justify-content-center">
                                                     <i class="icon-quote-left"></i>
                                                 </span>
@@ -405,7 +406,7 @@
                     <div class="col-sm-12 col-md ftco-animate">
                         <a href="images/insta-1.jpg"
                            class="insta-img image-popup"
-                           style="background-image: url(images/insta-1.jpg)">
+                           style="background-image: url({% static 'images/insta-1.jpg' %})" >
                             <div class="icon d-flex justify-content-center">
                                 <span class="icon-instagram align-self-center"></span>
                             </div>
@@ -414,7 +415,7 @@
                     <div class="col-sm-12 col-md ftco-animate">
                         <a href="images/insta-2.jpg"
                            class="insta-img image-popup"
-                           style="background-image: url(images/insta-2.jpg)">
+                           style="background-image: url({% static 'images/insta-2.jpg' %})">
                             <div class="icon d-flex justify-content-center">
                                 <span class="icon-instagram align-self-center"></span>
                             </div>
@@ -423,7 +424,7 @@
                     <div class="col-sm-12 col-md ftco-animate">
                         <a href="images/insta-3.jpg"
                            class="insta-img image-popup"
-                           style="background-image: url(images/insta-3.jpg)">
+                           style="background-image: url({% static 'images/insta-3.jpg' %})">
                             <div class="icon d-flex justify-content-center">
                                 <span class="icon-instagram align-self-center"></span>
                             </div>
@@ -432,7 +433,7 @@
                     <div class="col-sm-12 col-md ftco-animate">
                         <a href="images/insta-4.jpg"
                            class="insta-img image-popup"
-                           style="background-image: url(images/insta-4.jpg)">
+                           style="background-image: url({% static 'images/insta-4.jpg' %})">
                             <div class="icon d-flex justify-content-center">
                                 <span class="icon-instagram align-self-center"></span>
                             </div>
@@ -441,7 +442,7 @@
                     <div class="col-sm-12 col-md ftco-animate">
                         <a href="images/insta-5.jpg"
                            class="insta-img image-popup"
-                           style="background-image: url(images/insta-5.jpg)">
+                           style="background-image: url({% static 'images/insta-5.jpg' %})">
                             <div class="icon d-flex justify-content-center">
                                 <span class="icon-instagram align-self-center"></span>
                             </div>

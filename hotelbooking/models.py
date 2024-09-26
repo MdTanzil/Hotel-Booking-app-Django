@@ -1,4 +1,5 @@
 from django.db import models
+from ckeditor.fields import RichTextField
 
 
 class BaseModel(models.Model):
@@ -34,10 +35,10 @@ class Room_view(BaseModel):
 
 class Room(BaseModel):
     room_name = models.CharField(max_length=50)
-    room_price =  models.DecimalField(max_digits=11, decimal_places=2)
+    room_price = models.DecimalField(max_digits=11, decimal_places=2)
     max_person = models.IntegerField(default=1)
     room_size = models.IntegerField()
-    room_desc = models.TextField()
+    room_desc = RichTextField()
     room_category = models.ForeignKey(Room_category, on_delete=models.CASCADE)
     room_view = models.ManyToManyField(Room_view)
     room_bed = models.IntegerField(default=1)
