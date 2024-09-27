@@ -113,3 +113,12 @@ class Lead(BaseModel):
         Room, on_delete=models.CASCADE, blank=True, null=True, related_name="room_03"
     )
     guest = models.ManyToManyField(Guest)
+
+class Contact(BaseModel):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=15)
+    subject = models.CharField(max_length=100)
+    message = models.TextField()
+    def __str__(self):
+        return self.name

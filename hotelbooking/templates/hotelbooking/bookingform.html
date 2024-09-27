@@ -2,72 +2,59 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <form action="#" class="booking-form">
+                <form action="{% url 'hotelbooking:rooms' %}" method="post" class="booking-form">
+                    {% csrf_token %}
                     <div class="row">
+                        <!-- Check-in Date -->
                         <div class="col-md-3 d-flex">
                             <div class="form-group p-4 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
-                                    <label for="#">Check-in Date</label>
-                                    <input type="text"
-                                           class="form-control checkin_date"
+                                    <label for="checkin_date">Check-in Date</label>
+                                    <input type="date"
+                                           name="start_date"
+                                           id="checkin_date"
+                                           class="form-control"
                                            placeholder="Check-in date">
                                 </div>
                             </div>
                         </div>
+                        <!-- Check-out Date -->
                         <div class="col-md-3 d-flex">
                             <div class="form-group p-4 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
-                                    <label for="#">Check-out Date</label>
-                                    <input type="text"
-                                           class="form-control checkout_date"
+                                    <label for="checkout_date">Check-out Date</label>
+                                    <input type="date"
+                                           name="end_date"
+                                           id="checkout_date"
+                                           class="form-control"
                                            placeholder="Check-out date">
                                 </div>
                             </div>
                         </div>
+                        <!-- Room Type -->
                         <div class="col-md d-flex">
                             <div class="form-group p-4 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
-                                    <label for="#">Room</label>
+                                    <label for="room_type">Room</label>
                                     <div class="form-field">
                                         <div class="select-wrap">
                                             <div class="icon">
                                                 <span class="ion-ios-arrow-down"></span>
                                             </div>
-                                            <select class="form-control">
-                                                <option value="">Suite</option>
-                                                <option value="">Family Room</option>
-                                                <option value="">Deluxe Room</option>
-                                                <option value="">Classic Room</option>
-                                                <option value="">Superior Room</option>
-                                                <option value="">Luxury Room</option>
+                                            <select class="form-control" name="room_type" id="room_type">
+                                                <option value="suite">Suite</option>
+                                                <option value="family_room">Family Room</option>
+                                                <option value="deluxe_room">Deluxe Room</option>
+                                                <option value="classic_room">Classic Room</option>
+                                                <option value="superior_room">Superior Room</option>
+                                                <option value="luxury_room">Luxury Room</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md d-flex">
-                            <div class="form-group p-4 align-self-stretch d-flex align-items-end">
-                                <div class="wrap">
-                                    <label for="#">Customer</label>
-                                    <div class="form-field">
-                                        <div class="select-wrap">
-                                            <div class="icon">
-                                                <span class="ion-ios-arrow-down"></span>
-                                            </div>
-                                            <select class="form-control">
-                                                <option value="">1 Adult</option>
-                                                <option value="">2 Adult</option>
-                                                <option value="">3 Adult</option>
-                                                <option value="">4 Adult</option>
-                                                <option value="">5 Adult</option>
-                                                <option value="">6 Adult</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Submit Button -->
                         <div class="col-md d-flex">
                             <div class="form-group d-flex align-self-stretch">
                                 <input type="submit"

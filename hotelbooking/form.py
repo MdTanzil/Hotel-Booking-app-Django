@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import Booking, Package_Booking
+from .models import Booking, Package_Booking, Contact
 from datetime import datetime
 
 # Create the form class.
@@ -29,3 +29,10 @@ class PackageBookingForm(ModelForm):
     class Meta:
         model = Package_Booking
         exclude = ["package", "active"]
+
+class ContactForm(ModelForm):
+    
+    class Meta:
+        model = Contact
+        fields = ['name', 'email', 'phone_number', 'subject', 'message']
+

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+Restaurants
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="About Us" %}
+    <section class="ftco-section bg-light">
+        <!-- About 6 - Bootstrap Brain Component -->
+<section class="bsb-about-6 py-3 py-md-5 py-xl-8">
+    <div class="container">
+      <div class="row justify-content-md-center">
+        <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
+          <h2 class="mb-4 display-5 text-center">Why Choose Our Hotel</h2>
+          <p class="text-secondary mb-5 text-center lead fs-4">Our commitment highest quality  and services.</p>
+          <hr class="w-50 mx-auto mb-5 mb-xl-9 border-dark-subtle">
+        </div>
+      </div>
+    </div>
+  
+    <div class="container">
+      <div class="row gy-4 gy-lg-0 align-items-lg-center">
+        <div class="col-12 col-lg-6">
+          <img class="img-fluid rounded border border-dark" loading="lazy"  src="{% static 'images/about.jpg' %} " alt="About 6">
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="row justify-content-xl-end">
+            <div class="col-12 col-xl-11">
+                <div id="accordion">
+                    <div class="card">
+                      <div class="card-header " id="headingOne">
+                        <h5 class="mb-0">
+                          <button class="btn btn-primary btn-lg btn-block " data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Low Price Guarantee
+                          </button>
+                        </h5>
+                      </div>
+                  
+                      <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                        <div class="card-body ">
+                            Our Low Price Guarantee isn't just a promise; it's a commitment to providing you with unbeatable value and peace of mind when you shop with us. Trust us to deliver quality products and services without breaking the bank.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                          <h5 class="mb-0">
+                            <button class="btn btn-primary btn-lg btn-block" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                              24/7 Room Service
+                            </button>
+                          </h5>
+                        </div>
+                      
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                          <div class="card-body">
+                            Enjoy gourmet meals, snacks, and beverages delivered right to your room, day or night. Our room service menu offers a wide variety of delicious options to satisfy your cravings, no matter the time.
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card">
+                        <div class="card-header" id="headingThree">
+                          <h5 class="mb-0">
+                            <button class="btn btn-primary btn-lg btn-block" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                              Free High-Speed Wi-Fi
+                            </button>
+                          </h5>
+                        </div>
+                      
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                          <div class="card-body">
+                            Stay connected with our complimentary high-speed Wi-Fi available throughout the hotel. Whether you're working or streaming, our reliable internet ensures you're always online.
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card">
+                        <div class="card-header" id="headingFour">
+                          <h5 class="mb-0">
+                            <button class="btn btn-primary btn-lg btn-block" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                              Spa and Wellness
+                            </button>
+                          </h5>
+                        </div>
+                      
+                        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+                          <div class="card-body">
+                            Indulge in relaxation and rejuvenation at our on-site spa. With a variety of treatments, including massages, facials, and body therapies, we offer everything you need to unwind and recharge.
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card">
+                        <div class="card-header" id="headingSix">
+                          <h5 class="mb-0">
+                            <button class="btn btn-primary btn-lg btn-block" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                              Complimentary Airport Shuttle
+                            </button>
+                          </h5>
+                        </div>
+                      
+                        <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordion">
+                          <div class="card-body">
+                            Travel stress-free with our complimentary airport shuttle service. Available to all guests, our shuttle ensures a smooth and convenient trip to and from the hotel.
+                          </div>
+                        </div>
+                      </div>
+                      
+                      
+                 
+                  
+                  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+{% endblock body %}

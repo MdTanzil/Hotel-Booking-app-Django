@@ -9,6 +9,7 @@ from .models import (
     Package_Booking,
     Guest,
     Lead,
+    Contact,
 )
 
 
@@ -58,6 +59,12 @@ class GuestAdmin(admin.ModelAdmin):
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(Contact)
+class LeadAdmin(admin.ModelAdmin):
+    pass
+
 
 
 admin.site.register(Room_category, Room_categoryAdmin)

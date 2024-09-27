@@ -4,12 +4,13 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView
 from .models import Room, Package, Booking, Room_category, Package_Booking
 from django.db.models import Q
-from .form import BookingForm, PackageBookingForm
+from .form import BookingForm, PackageBookingForm,ContactForm
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from sslcommerz_lib import SSLCOMMERZ
 from decimal import Decimal
-
+from django.views.generic import FormView
+from django.urls import reverse_lazy
 # Create your views here.
 
 
@@ -48,17 +49,17 @@ class RoomsTemplate(View):
             start_date = request.POST.get("start_date")
             end_date = request.POST.get("end_date")
             room_type = request.POST.get("room_type")
-            booking_data = Booking.objects.filter(
-                ~Q(start_date__lte=end_date, end_date__gte=start_date)
-            )
+            print("coming here...", start_date, end_date)
+            
+            if start_date and end_date:
+            # Get rooms that are not booked during the requested period
+                unavailable_rooms = Booking.objects.filter(
+                    Q(start_date__lt=end_date) & Q(end_date__gt=start_date)
+                ).values_list('room_id', flat=True)
 
-            id_list = []
-            for i in booking_data:
-                id_list.append(i.room.id)
-            rooms = Room.objects.filter(id__in=id_list)
-            template_name = "hotelbooking/searchroom.html"
-            context = {"rooms": rooms, "start_date": start_date, "end_date": end_date}
-            return render(request, template_name, context)
+                available_rooms = Room.objects.exclude(id__in=unavailable_rooms)
+                context = {"rooms": available_rooms, "start_date": start_date, "end_date": end_date}
+                return render(request, 'hotelbooking/searchroom.html', context)
         except:
             return render(request, template_name)
 
@@ -153,3 +154,28 @@ class PackageBookingCreateView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
         return render(request, "hotelbooking/index.html")
+
+
+class RestaurantsTemplateView(TemplateView):
+    template_name = "hotelbooking/restaurants/main.html"
+    
+
+class AboutUsTemplateView(TemplateView):
+    template_name = "hotelbooking/about/main.html"
+    
+
+class BlogTemplateView(TemplateView):
+    template_name = "hotelbooking/blog/main.html"
+    
+
+class ContactFormView(FormView):
+    form_class = ContactForm
+    template_name = "hotelbooking/contact/main.html"
+    success_url = reverse_lazy('hotelbooking:home')  # Redirect after a successful form submission
+
+    def form_valid(self, form):
+        # Save the form data to the database
+        form.save()
+        return super().form_valid(form)
+
+    

@@ -6,6 +6,12 @@ from .views import (
     RoomDetails,
     CreateBookingRoom,
     PackageBookingCreateView,
+    RestaurantsTemplateView,
+    AboutUsTemplateView,
+    BlogTemplateView,
+    ContactFormView
+    
+    
 )
 
 app_name = "hotelbooking"
@@ -20,4 +26,12 @@ urlpatterns = [
         PackageBookingCreateView.as_view(),
         name="booking-package",
     ),
+    path('restaurants/', RestaurantsTemplateView.as_view(),name='restaurants_home'),
+    path('about-us/', AboutUsTemplateView.as_view(),name='about-us'),
+    path('blog/', BlogTemplateView.as_view(),name='blog'),
+    path('contact/', ContactFormView.as_view(),name='contact-us'),
+    
+    
+    
+    
 ]
