@@ -13,6 +13,13 @@
 	          <li class="nav-item"><a href="{% url 'hotelbooking:about-us' %}" class="nav-link">About</a></li>
 	          <li class="nav-item"><a href="{% url 'hotelbooking:blog' %}" class="nav-link">Blog</a></li>
 	          <li class="nav-item"><a href="{% url 'hotelbooking:contact-us' %}" class="nav-link">Contact</a></li>
+			  {% if user.is_authenticated %}
+	          <li class="nav-item" style="display: flex; justify-content: center; align-items: center;"> Hello, {{ user.username }}!<a href="{% url 'account_logout' %}" class="nav-link">Logout</a></li>
+
+			{% else %}
+			<li class="nav-item"><a href="{% url 'account_login' %}" class="nav-link">Login</a></li>
+			{% endif %}
+
 	        </ul>
 	      </div>
 	    </div>

@@ -1,46 +1,69 @@
-{% extends "account/base.html" %}
-
+{% extends "base.html" %}
 {% load i18n %}
+{% load crispy_forms_tags %}
 {% load account socialaccount %}
+{% load static %}
+{% block head_title %}
+  {% trans "Sign In" %}
+{% endblock %}
 
-{% block head_title %}{% trans "Sign In" %}{% endblock %}
-
-{% block content %}
-
-<h1>{% trans "Sign In" %}</h1>
-
-{% get_providers as socialaccount_providers %}
-
-{% if socialaccount_providers %}
-<p>{% blocktrans with site.name as site_name %}Please sign in with one
-of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
-
-<div class="socialaccount_ballot">
-
-  <ul class="socialaccount_providers">
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-  </ul>
-
-  <div class="login-or">{% trans 'or' %}</div>
-
+{% block body %}
+<div class="hero-wrap"
+     style="background-image: url({% static 'images/bg_1.jpg' %});"
+  <div class="container">
+    <div class="row no-gutters slider-text d-flex align-itemd-end justify-content-center">
+      <div class="col-md-9 ftco-animate text-center d-flex align-items-end justify-content-center">
+        <div class="text">
+          <p class="breadcrumbs mb-2">
+            <span class="mr-2"><a href="{% url 'hotelbooking:home' %}">Home</a></span>
+  
+          </p>
+          <h1 class="mb-4 bread">Login</h1>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-{% include "socialaccount/snippets/login_extra.html" %}
-
-{% else %}
-<p>{% blocktrans %}If you have not created an account yet, then please
-<a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
-{% endif %}
-
-<form class="login" method="POST" action="{% url 'account_login' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
-  <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-  <button class="primaryAction" type="submit">{% trans "Sign In" %}</button>
-</form>
-
-{% endblock %}
+  <div class="container mx-auto">
+    <h1>{% trans "Sign In" %}</h1>
+    {% get_providers as socialaccount_providers %}
+    {% if socialaccount_providers %}
+      <p>
+        {% blocktrans with site.name as site_name %}Please sign in with one
+  of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
+  for a {{ site_name }} account and sign in below:{% endblocktrans %}
+      </p>
+      <div class="socialaccount_ballot">
+        <ul class="socialaccount_providers">
+          {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+        </ul>
+        <div class="login-or">{% trans 'or' %}</div>
+      </div>
+      {% comment %}
+  {% include "socialaccount/snippets/login_extra.html" %}
+    
+      {% endcomment %}
+    {% else %}
+      <div>
+        <p>
+          {% blocktrans %}If you have not created an account yet, then please
+    <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}
+        </p>
+      </div>
+    {% endif %}
+    <form class="login" method="post" action="{% url 'account_login' %}">
+      {% csrf_token %}
+      {{ form|crispy }}
+      {% if redirect_field_value %}
+        <input type="hidden"
+               name="{{ redirect_field_name }}"
+               value="{{ redirect_field_value }}" />
+      {% endif %}
+      <a class="button secondaryAction"
+         href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+         <br>
+      <button class="primaryAction btn btn-primary mt-2 mb-4" type="submit">{% trans "Sign In" %}</button>
+    </form>
+  </div>
+{% endblock body %}

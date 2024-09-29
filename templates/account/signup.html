@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load account %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% load account i18n %}
+{% block head_title %}
+    {% trans "Signup" %}
+{% endblock head_title %}
+{% block body %}
+<div class="hero-wrap"
+     style="background-image: url({% static 'images/bg_1.jpg' %});">
+  <div class="container">
+    <div class="row no-gutters slider-text d-flex align-itemd-end justify-content-center">
+      <div class="col-md-9 ftco-animate text-center d-flex align-items-end justify-content-center">
+        <div class="text">
+          <p class="breadcrumbs mb-2">
+            <span class="mr-2"><a href="{% url 'hotelbooking:home' %}">Home</a></span>
+  
+          </p>
+          <h1 class="mb-4 bread">Sign Up</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container mx-auto">
+   
+    <h1>{% trans "Sign Up" %}</h1>
+    
+    
+    <p>Already have an account? Then please <a href="{% url 'account_login' %}" class=" text-primary ">sign in</a> </p>
+    
+    {% if not SOCIALACCOUNT_ONLY %}
+        {% url 'account_signup' as action_url %}
+        <form action="{% url 'account_signup' %}"  method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+                <button class="btn btn-primary mt-2 mb-4">Sign Up</button>
+        </form>
+    {% endif %}
+    {% if PASSKEY_SIGNUP_ENABLED %}
+        
+        <hr>
+
+    {% endif %}
+    {% if SOCIALACCOUNT_ENABLED %}
+        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    {% endif %}
+</div>
+{% endblock body %}
