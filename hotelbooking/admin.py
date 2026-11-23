@@ -10,6 +10,7 @@ from .models import (
     Guest,
     Lead,
     Contact,
+    Review,
 )
 
 
@@ -51,6 +52,13 @@ class PackageBookingAdmin(admin.ModelAdmin):
     list_display = ("reference", "name", "package", "phone_number", "status", "payment_status", "user")
     list_filter = ("status", "payment_status")
     search_fields = ["name", "phone_number", "reference"]
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ("guest_name", "room", "rating", "created_at")
+    list_filter = ("rating", "room")
+    search_fields = ["guest_name", "text"]
 
 
 @admin.register(Guest)

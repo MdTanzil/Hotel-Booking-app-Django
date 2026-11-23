@@ -23,6 +23,7 @@ from django.core.management.base import BaseCommand
 from hotelbooking.models import (
     Package,
     Package_item,
+    Review,
     Room,
     Room_category,
     Room_view,
@@ -150,6 +151,69 @@ PACKAGES = [
 
 DEMO_PASSWORD = "demo1234"
 
+# Sample guest reviews shown on room pages and the home page.
+# These are fictional demo content for the demo hotel.
+# room name, guest name, rating (1-5), text
+REVIEWS = [
+    (
+        "Deluxe King Room",
+        "Sarah M.",
+        5,
+        "Spotless room, a very comfortable bed and quiet at night. "
+        "Check-in took two minutes. Would happily stay again.",
+    ),
+    (
+        "Deluxe King Room",
+        "Rahim U.",
+        4,
+        "Great value for the price. The shower pressure could be better, "
+        "but the room itself was clean and the staff were friendly.",
+    ),
+    (
+        "Premium Suite",
+        "Elena R.",
+        5,
+        "The sea view from the suite is worth every penny. Breakfast was "
+        "excellent and the staff arranged a late checkout for us.",
+    ),
+    (
+        "Family Suite",
+        "James L.",
+        5,
+        "Plenty of space for two adults and two kids, and the garden "
+        "balcony was perfect for evening tea. Highly recommended.",
+    ),
+    (
+        "Executive Twin Room",
+        "Priya K.",
+        4,
+        "Good desk setup and fast Wi-Fi for working. A little street noise "
+        "in the morning, but overall a solid business stay.",
+    ),
+    (
+        "Executive King Suite",
+        "Daniel O.",
+        5,
+        "Beautiful suite and the private balcony at sunset is something "
+        "else. The team even helped us book a local tour.",
+    ),
+    (
+        "Deluxe Queen Room",
+        "Nadia H.",
+        4,
+        "Calm room overlooking the gardens, very dark and quiet for "
+        "sleeping. Would have liked a few more power outlets.",
+    ),
+    (
+        "Family Suite",
+        "Tom W.",
+        3,
+        "Roomy and clean, but the air conditioning was noisy on the first "
+        "night. Staff fixed it the next morning.",
+    ),
+]
+
+
 # Demo accounts shown on the login page so visitors can try the site.
 # username, email, display name, is_staff, is_superuser
 DEMO_USERS = [
@@ -221,6 +285,14 @@ class Command(BaseCommand):
             package.package_item.set(items[i] for i in item_names)
             self._ensure_image(package.package_image, image)
             self.stdout.write(f"Package: {name}")
+
+        for room_name, guest_name, rating, text in REVIEWS:
+            Review.objects.get_or_create(
+                room=rooms[room_name],
+                guest_name=guest_name,
+                defaults={"rating": rating, "text": text},
+            )
+            self.stdout.write(f"Review: {guest_name} on {room_name}")
 
         self._seed_demo_users()
 

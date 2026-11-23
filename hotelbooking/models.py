@@ -1,6 +1,7 @@
 import random
 
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from ckeditor.fields import RichTextField
 
@@ -165,6 +166,37 @@ class Package_Booking(BaseModel):
                     self.reference = candidate
                     break
         super().save(*args, **kwargs)
+
+
+class Review(BaseModel):
+    room = models.ForeignKey(
+        Room, on_delete=models.CASCADE, related_name="reviews"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="room_reviews",
+    )
+    guest_name = models.CharField(max_length=100)
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    text = models.TextField(max_length=1000)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["room", "user"],
+                condition=models.Q(user__isnull=False),
+                name="unique_room_review_per_user",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.guest_name} - {self.room.room_name} ({self.rating}/5)"
 
 
 class Guest(BaseModel):

@@ -191,6 +191,7 @@
             </div>
         </section>
 		<!-- review  start -->
+        {% if testimonials %}
         <section class="ftco-section testimony-section bg-light">
             <div class="container">
                 <div class="row justify-content-center">
@@ -198,91 +199,24 @@
                         <div class="row ftco-animate">
                             <div class="col-md-12">
                                 <div class="carousel-testimony owl-carousel ftco-owl">
+                                    {% for review in testimonials %}
                                     <div class="item">
                                         <div class="testimony-wrap py-4 pb-5">
+                                            {% cycle 'images/person_1.jpg' 'images/person_2.jpg' 'images/person_3.jpg' as person_img silent %}
                                             <div class="user-img mb-4"
-                                                 style="background-image: url({% static 'images/person_1.jpg' %})" >
+                                                 style="background-image: url({% static person_img %})">
                                                 <span class="quote d-flex align-items-center justify-content-center">
                                                     <i class="icon-quote-left"></i>
                                                 </span>
                                             </div>
                                             <div class="text text-center">
-                                                <p class="mb-4">
-                                                    A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-                                                </p>
-                                                <p class="name">Nathan Smith</p>
-                                                <span class="position">Guests</span>
+                                                <p class="mb-4">{{ review.text }}</p>
+                                                <p class="name">{{ review.guest_name }}</p>
+                                                <span class="position">Guest &mdash; {{ review.room.room_name }} ({{ review.rating }}/5)</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="item">
-                                        <div class="testimony-wrap py-4 pb-5">
-                                            <div class="user-img mb-4"
-                                                 style="background-image: url({% static 'images/person_2.jpg' %})">
-                                                <span class="quote d-flex align-items-center justify-content-center">
-                                                    <i class="icon-quote-left"></i>
-                                                </span>
-                                            </div>
-                                            <div class="text text-center">
-                                                <p class="mb-4">
-                                                    A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-                                                </p>
-                                                <p class="name">Nathan Smith</p>
-                                                <span class="position">Guests</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="testimony-wrap py-4 pb-5">
-                                            <div class="user-img mb-4"
-                                                 style="background-image: url({% static 'images/person_3.jpg' %})">
-                                                <span class="quote d-flex align-items-center justify-content-center">
-                                                    <i class="icon-quote-left"></i>
-                                                </span>
-                                            </div>
-                                            <div class="text text-center">
-                                                <p class="mb-4">
-                                                    A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-                                                </p>
-                                                <p class="name">Nathan Smith</p>
-                                                <span class="position">Guests</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="testimony-wrap py-4 pb-5">
-                                            <div class="user-img mb-4"
-                                                 style="background-image: url({% static 'images/person_1.jpg' %})">
-                                                <span class="quote d-flex align-items-center justify-content-center">
-                                                    <i class="icon-quote-left"></i>
-                                                </span>
-                                            </div>
-                                            <div class="text text-center">
-                                                <p class="mb-4">
-                                                    A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-                                                </p>
-                                                <p class="name">Nathan Smith</p>
-                                                <span class="position">Guests</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="item">
-                                        <div class="testimony-wrap py-4 pb-5">
-                                            <div class="user-img mb-4"
-                                                 style="background-image: url({% static 'images/person_1.jpg' %})">
-                                                <span class="quote d-flex align-items-center justify-content-center">
-                                                    <i class="icon-quote-left"></i>
-                                                </span>
-                                            </div>
-                                            <div class="text text-center">
-                                                <p class="mb-4">
-                                                    A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
-                                                </p>
-                                                <p class="name">Nathan Smith</p>
-                                                <span class="position">Guests</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
@@ -290,6 +224,7 @@
                 </div>
             </div>
         </section>
+        {% endif %}
         <section class="ftco-section">
             <div class="container">
                 <div class="row justify-content-center mb-5 pb-3">

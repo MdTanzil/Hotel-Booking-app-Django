@@ -14,6 +14,8 @@ from .views import (
     PaymentSuccessView,
     PaymentCancelView,
     StripeWebhookView,
+    AddReviewView,
+    DeleteReviewView,
     RestaurantsTemplateView,
     AboutUsTemplateView,
     BlogTemplateView,
@@ -28,6 +30,16 @@ urlpatterns = [
     path("rooms/", RoomsTemplate.as_view(), name="rooms"),
     path("package/", PackageTemplate.as_view(), name="packages"),
     path("details-room/<str:pk>", RoomDetails.as_view(), name="details-room"),
+    path(
+        "details-room/<str:pk>/review/",
+        AddReviewView.as_view(),
+        name="add-review",
+    ),
+    path(
+        "reviews/<int:pk>/delete/",
+        DeleteReviewView.as_view(),
+        name="delete-review",
+    ),
     path("booking-room/<str:pk>", CreateBookingRoom.as_view(), name="booking-room"),
     path(
         "booking-package/<str:pk>",

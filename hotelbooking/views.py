@@ -10,9 +10,9 @@ from datetime import datetime, date, timedelta
 from django.contrib import messages
 from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView
-from .models import Room, Package, Booking, Room_category, Package_Booking
-from django.db.models import Q
-from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm
+from .models import Room, Package, Booking, Room_category, Package_Booking, Review
+from django.db.models import Q, Avg
+from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm
 from .emails import (
     send_booking_confirmation,
     send_package_booking_confirmation,
@@ -41,6 +41,14 @@ class HomeTemplate(TemplateView):
     all_rooms = Room.objects.all().filter(active=True)[:3]
     template_name = "hotelbooking/index.html"
     extra_context = {"rooms": all_rooms}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["testimonials"] = (
+            Review.objects.select_related("room")
+            .order_by("-created_at", "-id")[:5]
+        )
+        return context
 
 
 class RoomsTemplate(View):
@@ -163,10 +171,55 @@ class RoomDetails(LoginRequiredMixin, TemplateView):
 
         room = Room.objects.get(id=pk)
         template_name = "hotelbooking/rooms-single.html"
+        reviews = room.reviews.select_related("user").order_by("-created_at")
+        average = reviews.aggregate(Avg("rating"))["rating__avg"]
+        user_review = None
+        if request.user.is_authenticated:
+            user_review = reviews.filter(user=request.user).first()
         context = {
             "room": room,
+            "reviews": reviews,
+            "review_count": reviews.count(),
+            "average_rating": round(average, 1) if average else None,
+            "review_form": ReviewForm(instance=user_review),
+            "user_review": user_review,
         }
         return render(request, template_name, context)
+
+
+class AddReviewView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        room = Room.objects.get(id=pk)
+        user_review = Review.objects.filter(
+            room=room, user=request.user
+        ).first()
+        form = ReviewForm(request.POST, instance=user_review)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.room = room
+            review.user = request.user
+            review.guest_name = request.user.username
+            review.save()
+            if user_review:
+                messages.success(request, "Your review has been updated.")
+            else:
+                messages.success(request, "Thank you for your review!")
+        else:
+            messages.error(
+                request, "Please choose a rating and write your review."
+            )
+        return redirect("hotelbooking:details-room", pk=pk)
+
+
+class DeleteReviewView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        review = get_object_or_404(Review, pk=pk)
+        if review.user != request.user and not request.user.is_staff:
+            raise Http404("Review not found")
+        room_pk = review.room.pk
+        review.delete()
+        messages.success(request, "Your review has been deleted.")
+        return redirect("hotelbooking:details-room", pk=room_pk)
 
 
 class CreateBookingRoom(LoginRequiredMixin, View):

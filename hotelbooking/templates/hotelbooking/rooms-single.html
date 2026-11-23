@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load crispy_forms_tags %}
 {% block title %}
   Rooms Detais
 {% endblock title %}
@@ -49,6 +50,31 @@
               </div>
               <p>{{ room.room_desc|safe }}</p>
           
+            </div>
+            <div class="col-md-12 ftco-animate">
+              <h3 class="mb-4">Guest reviews{% if average_rating %} — {{ average_rating }} out of 5 ({{ review_count }} review{{ review_count|pluralize }}){% endif %}</h3>
+              {% if reviews %}
+                {% for review in reviews %}
+                <div class="mb-4 p-3" style="background: #f8f9fa; border: 1px solid #e9ecef;">
+                  <p class="mb-1"><strong>{{ review.guest_name }}</strong> — {{ review.rating }}/5 stars <span class="text-muted">{{ review.created_at|date:"d M Y" }}</span>{% if user_review and review.pk == user_review.pk %} <span class="badge badge-primary">Your review</span>{% endif %}</p>
+                  <p class="mb-0">{{ review.text }}</p>
+                  {% if user_review and review.pk == user_review.pk %}
+                  <form action="{% url 'hotelbooking:delete-review' review.pk %}" method="post" class="mt-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete my review</button>
+                  </form>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              {% else %}
+                <p>No reviews yet — be the first to share your stay.</p>
+              {% endif %}
+              <h4 class="mt-5 mb-3">{% if user_review %}Update your review{% else %}Write a review{% endif %}</h4>
+              <form action="{% url 'hotelbooking:add-review' room.pk %}" method="post">
+                {% csrf_token %}
+                {{ review_form|crispy }}
+                <button type="submit" class="btn btn-primary">{% if user_review %}Update review{% else %}Post review{% endif %}</button>
+              </form>
             </div>
           </div>
         </div>

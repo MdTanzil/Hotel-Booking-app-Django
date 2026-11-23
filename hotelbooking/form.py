@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import Booking, Package_Booking, Contact
+from .models import Booking, Package_Booking, Contact, Review
 from datetime import datetime
 
 # Create the form class.
@@ -68,4 +68,26 @@ class ContactForm(ModelForm):
     class Meta:
         model = Contact
         fields = ['name', 'email', 'phone_number', 'subject', 'message']
+
+
+class ReviewForm(ModelForm):
+    rating = forms.TypedChoiceField(
+        choices=[
+            (5, "5 - Excellent"),
+            (4, "4 - Very good"),
+            (3, "3 - Good"),
+            (2, "2 - Fair"),
+            (1, "1 - Poor"),
+        ],
+        coerce=int,
+        widget=forms.RadioSelect,
+    )
+    text = forms.CharField(
+        label="Your review",
+        widget=forms.Textarea(attrs={"rows": 3, "maxlength": "1000"}),
+    )
+
+    class Meta:
+        model = Review
+        fields = ["rating", "text"]
 
