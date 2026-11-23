@@ -10,18 +10,29 @@
 	          <li class="nav-item"><a href="{% url 'hotelbooking:rooms' %}" class="nav-link">Rooms</a></li>
 	          <li class="nav-item"><a href="{% url 'hotelbooking:restaurants_home' %}" class="nav-link">Restaurant</a></li>
 	          <li class="nav-item"><a href="{% url 'hotelbooking:packages' %}" class="nav-link">Package</a></li>
-	          <li class="nav-item"><a href="{% url 'hotelbooking:about-us' %}" class="nav-link">About</a></li>
-	          <li class="nav-item"><a href="{% url 'hotelbooking:blog' %}" class="nav-link">Blog</a></li>
 	          <li class="nav-item"><a href="{% url 'hotelbooking:contact-us' %}" class="nav-link">Contact</a></li>
-	          <li class="nav-item"><a href="{% url 'hotelbooking:policies-faq' %}" class="nav-link">Policies &amp; FAQ</a></li>
+	          <li class="nav-item dropdown">
+	            <a class="nav-link dropdown-toggle" href="#" id="exploreDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Explore</a>
+	            <div class="dropdown-menu" aria-labelledby="exploreDropdown">
+	              <a class="dropdown-item" href="{% url 'hotelbooking:about-us' %}">About</a>
+	              <a class="dropdown-item" href="{% url 'hotelbooking:blog' %}">Blog</a>
+	              <a class="dropdown-item" href="{% url 'hotelbooking:events' %}">Events</a>
+	              <a class="dropdown-item" href="{% url 'hotelbooking:whats-included' %}">What's Included</a>
+	              <a class="dropdown-item" href="{% url 'hotelbooking:policies-faq' %}">Policies &amp; FAQ</a>
+	            </div>
+	          </li>
 	          <li class="nav-item"><a href="{% url 'hotelbooking:find-booking' %}" class="nav-link">Find Booking</a></li>
 			  {% if user.is_authenticated %}
-	          <li class="nav-item"><a href="{% url 'hotelbooking:my-bookings' %}" class="nav-link">My Bookings</a></li>
-	          {% if user.is_staff %}
-	          <li class="nav-item"><a href="{% url 'admin:index' %}" class="nav-link">Admin Panel</a></li>
-	          {% endif %}
-	          <li class="nav-item" style="display: flex; justify-content: center; align-items: center;"> Hello, {{ user.username }}!<a href="{% url 'account_logout' %}" class="nav-link">Logout</a></li>
-
+	          <li class="nav-item dropdown">
+	            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Hello, {{ user.username }}!</a>
+	            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="accountDropdown">
+	              <a class="dropdown-item" href="{% url 'hotelbooking:my-bookings' %}">My Bookings</a>
+	              {% if user.is_staff %}
+	              <a class="dropdown-item" href="{% url 'admin:index' %}">Admin Panel</a>
+	              {% endif %}
+	              <a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a>
+	            </div>
+	          </li>
 			{% else %}
 			<li class="nav-item"><a href="{% url 'account_login' %}" class="nav-link">Login</a></li>
 			{% endif %}
