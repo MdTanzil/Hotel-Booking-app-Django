@@ -134,24 +134,10 @@
 	};
 	carousel();
 
-	$('nav .dropdown').hover(function(){
-		var $this = $(this);
-		// 	 timer;
-		// clearTimeout(timer);
-		$this.addClass('show');
-		$this.find('> a').attr('aria-expanded', true);
-		// $this.find('.dropdown-menu').addClass('animated-fast fadeInUp show');
-		$this.find('.dropdown-menu').addClass('show');
-	}, function(){
-		var $this = $(this);
-			// timer;
-		// timer = setTimeout(function(){
-			$this.removeClass('show');
-			$this.find('> a').attr('aria-expanded', false);
-			// $this.find('.dropdown-menu').removeClass('animated-fast fadeInUp show');
-			$this.find('.dropdown-menu').removeClass('show');
-		// }, 100);
-	});
+	// NOTE: the theme used to open nav dropdowns on hover here. Removed:
+	// hover-open fights Bootstrap's click toggle (a click after hovering
+	// toggles the menu shut again, so the first click seems to do nothing).
+	// Dropdowns are now click-only, which also works on touch devices.
 
 
 	$('#dropdown04').on('show.bs.dropdown', function () {
@@ -285,7 +271,7 @@
 
 	// navigation
 	var OnePageNav = function() {
-		$(".smoothscroll[href^='#'], #ftco-nav ul li a[href^='#']").on('click', function(e) {
+		$(".smoothscroll[href^='#'], #ftco-nav ul li a[href^='#']:not(.dropdown-toggle)").on('click', function(e) {
 		 	e.preventDefault();
 
 		 	var hash = this.hash,
