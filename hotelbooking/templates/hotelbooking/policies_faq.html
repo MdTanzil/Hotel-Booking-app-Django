@@ -24,7 +24,7 @@
           <p>Your booking is confirmed as soon as you place it — no prepayment is required. You can pay at the hotel when you arrive. Where online payment is available, you can also pay in advance by card from the My Bookings page.</p>
 
           <h4 class="mt-4">Check-in &amp; check-out</h4>
-          <p>Check-in is from 2:00 PM and check-out is by 12:00 PM. Arriving late? Let us know in advance and we will keep your room ready. Please bring a valid photo ID or passport at check-in.</p>
+          <p>Check-in is from {{ site_settings.check_in_time|default:"2:00 PM" }} and check-out is by {{ site_settings.check_out_time|default:"12:00 PM" }}. Arriving late? Let us know in advance and we will keep your room ready. Please bring a valid photo ID or passport at check-in.</p>
 
           <h4 class="mt-4">House rules</h4>
           <p>Smoking is not allowed inside the rooms. Pets are welcome on request — please contact us before you arrive. Quiet hours are 10:00 PM to 7:00 AM. Each room has a maximum number of guests, shown on the room page; children under 12 stay free in the existing bedding.</p>

@@ -3,7 +3,7 @@
     <div class="row mb-5">
       <div class="col-md">
         <div class="ftco-footer-widget mb-4">
-          <h2 class="ftco-heading-2">Deluxe Hotel</h2>
+          <h2 class="ftco-heading-2">{{ site_settings.hotel_name|default:"Deluxe" }} Hotel</h2>
           <p>
             Comfortable rooms, a garden-facing pool and warm hospitality. Book direct for the best rate, free cancellation and pay at the hotel.
           </p>
@@ -50,13 +50,13 @@
           <div class="block-23 mb-3">
             <ul>
               <li>
-                <span class="icon icon-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span>
+                <span class="icon icon-map-marker"></span><span class="text">{{ site_settings.address|default:"203 Fake St. Mountain View, San Francisco, California, USA" }}</span>
               </li>
               <li>
-                <a href="#"><span class="icon icon-phone"></span><span class="text">+2 392 3929 210</span></a>
+                <a href="tel:{{ site_settings.phone|default:"+2 392 3929 210"|cut:" " }}"><span class="icon icon-phone"></span><span class="text">{{ site_settings.phone|default:"+2 392 3929 210" }}</span></a>
               </li>
               <li>
-                <a href="#"><span class="icon icon-envelope"></span><span class="text">info@yourdomain.com</span></a>
+                <a href="mailto:{{ site_settings.email|default:"info@yourdomain.com" }}"><span class="icon icon-envelope"></span><span class="text">{{ site_settings.email|default:"info@yourdomain.com" }}</span></a>
               </li>
             </ul>
           </div>

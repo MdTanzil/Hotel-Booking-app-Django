@@ -551,3 +551,42 @@ class TableBooking(BaseModel):
 
     def __str__(self):
         return f"{self.name} — {self.date} {self.time} ({self.guests} guests)"
+
+
+class SiteSettings(BaseModel):
+    """Singleton: the hotel's public information, editable in the admin.
+
+    The footer contact block, the navbar brand and the check-in/out times
+    on the Policies page all read from this one row (via the
+    ``site_settings`` context processor). Only one row should ever exist;
+    the admin blocks adding a second one and deleting the only one.
+    """
+
+    hotel_name = models.CharField(max_length=100, default="Deluxe")
+    address = models.TextField(
+        default="203 Fake St. Mountain View, San Francisco, California, USA"
+    )
+    phone = models.CharField(max_length=50, default="+2 392 3929 210")
+    email = models.EmailField(default="info@yourdomain.com")
+    check_in_time = models.CharField(
+        max_length=20,
+        default="2:00 PM",
+        help_text="As shown on the Policies page, e.g. 2:00 PM",
+    )
+    check_out_time = models.CharField(
+        max_length=20,
+        default="12:00 PM",
+        help_text="As shown on the Policies page, e.g. 12:00 PM",
+    )
+
+    class Meta:
+        verbose_name = "Site information"
+        verbose_name_plural = "Site information"
+
+    def __str__(self):
+        return f"Site information ({self.hotel_name})"
+
+    @classmethod
+    def get_settings(cls):
+        """The single settings row, or None if it does not exist yet."""
+        return cls.objects.first()

@@ -21,6 +21,7 @@ from .models import (
     BlogPost,
     TableBooking,
     Event,
+    SiteSettings,
 )
 
 
@@ -288,6 +289,34 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ("category", "published")
     search_fields = ["title", "excerpt"]
     prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    """Singleton: one row holds the hotel's public information.
+
+    The footer contact block, the navbar brand and the check-in/out times
+    on the Policies page read from this row, so editing here updates the
+    whole site at once.
+    """
+
+    list_display = ("hotel_name", "phone", "email", "updated_at")
+    fieldsets = (
+        (None, {"fields": ("hotel_name",)}),
+        ("Contact (shown in the footer)", {"fields": ("address", "phone", "email")}),
+        (
+            "Check-in / check-out (shown on the Policies page)",
+            {"fields": ("check_in_time", "check_out_time")},
+        ),
+    )
+
+    def has_add_permission(self, request):
+        # Singleton: only one row may exist.
+        return not SiteSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        # Deleting the only row would silently revert the site to defaults.
+        return False
 
 
 @admin.register(TableBooking)

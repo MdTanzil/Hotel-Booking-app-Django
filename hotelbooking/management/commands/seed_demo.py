@@ -32,6 +32,7 @@ from hotelbooking.models import (
     RoomAmenity,
     Room_category,
     Room_view,
+    SiteSettings,
 )
 
 STATIC_IMAGES = Path(settings.BASE_DIR) / "static" / "images"
@@ -541,6 +542,24 @@ class Command(BaseCommand):
                 },
             )
             self.stdout.write(f"Event: {title}")
+
+        # Site information: one row, editable in the admin. Created only
+        # when missing, so an admin's edits are never overwritten by a
+        # later deploy's seed run.
+        SiteSettings.objects.get_or_create(
+            defaults={
+                "hotel_name": "Deluxe",
+                "address": (
+                    "203 Fake St. Mountain View, San Francisco, "
+                    "California, USA"
+                ),
+                "phone": "+2 392 3929 210",
+                "email": "info@yourdomain.com",
+                "check_in_time": "2:00 PM",
+                "check_out_time": "12:00 PM",
+            }
+        )
+        self.stdout.write("Site information: Deluxe")
 
         self._seed_demo_users()
 
