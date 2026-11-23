@@ -33,6 +33,9 @@
                                             <p>
                                                 <span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>
                                             </p>
+                                            {% if nights %}
+                                            <p class="mb-0"><strong>Total for {{ nights }} night{{ nights|pluralize }}: ${{ room.stay_total }}</strong></p>
+                                            {% endif %}
                                             <ul class="list">
                                                 <li>
                                                     <span>Max:</span> {{ room.max_person }}

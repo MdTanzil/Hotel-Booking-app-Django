@@ -59,7 +59,24 @@ class RoomsTemplate(View):
                 ).values_list('room_id', flat=True)
 
                 available_rooms = Room.objects.exclude(id__in=unavailable_rooms)
-                context = {"rooms": available_rooms, "start_date": start_date, "end_date": end_date}
+                try:
+                    nights = (
+                        datetime.strptime(end_date, "%Y-%m-%d").date()
+                        - datetime.strptime(start_date, "%Y-%m-%d").date()
+                    ).days
+                except ValueError:
+                    nights = None
+                if nights is not None and nights < 1:
+                    nights = None
+                if nights:
+                    for room in available_rooms:
+                        room.stay_total = room.room_price * nights
+                context = {
+                    "rooms": available_rooms,
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "nights": nights,
+                }
                 return render(request, 'hotelbooking/searchroom.html', context)
         except:
             return render(request, template_name)
@@ -125,10 +142,10 @@ class RoomDetails(LoginRequiredMixin, TemplateView):
 
 class CreateBookingRoom(LoginRequiredMixin, View):
     def get(self, request, pk):
-        id = pk
+        room = Room.objects.get(id=pk)
         form = BookingForm()
         template_name = "hotelbooking/createBooking.html"
-        context = {"form": form, "id": pk}
+        context = {"form": form, "id": pk, "room": room}
         return render(request, template_name, context)
 
     def post(self, request, pk):
@@ -136,25 +153,30 @@ class CreateBookingRoom(LoginRequiredMixin, View):
         form = BookingForm(request.POST, instance=Booking(room=room))
         if form.is_valid():
             form.save()
+            nights = (
+                form.cleaned_data["end_date"] - form.cleaned_data["start_date"]
+            ).days
+            total = room.room_price * nights
             messages.success(
                 request,
                 f"Your booking for {room.room_name} is confirmed for "
                 f"{form.cleaned_data['start_date']} to "
-                f"{form.cleaned_data['end_date']}. Our team will call you "
-                "for confirmation.",
+                f"{form.cleaned_data['end_date']} ({nights} night"
+                f"{'s' if nights != 1 else ''}, total ${total}). "
+                "Our team will call you for confirmation.",
             )
             return redirect("hotelbooking:rooms")
         template_name = "hotelbooking/createBooking.html"
-        context = {"form": form, "id": pk}
+        context = {"form": form, "id": pk, "room": room}
         return render(request, template_name, context)
 
 
 class PackageBookingCreateView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        id = pk
+        package = Package.objects.get(id=pk)
         form = PackageBookingForm()
         template_name = "hotelbooking/create_package_booking.html"
-        context = {"form": form, "id": pk}
+        context = {"form": form, "id": pk, "package": package}
         return render(request, template_name, context)
 
     def post(self, request, pk):
@@ -171,7 +193,7 @@ class PackageBookingCreateView(LoginRequiredMixin, View):
             )
             return redirect("hotelbooking:packages")
         template_name = "hotelbooking/create_package_booking.html"
-        context = {"form": form, "id": pk}
+        context = {"form": form, "id": pk, "package": package}
         return render(request, template_name, context)
 
 

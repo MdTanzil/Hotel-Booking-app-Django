@@ -23,6 +23,14 @@ class BookingForm(ModelForm):
         model = Booking
         exclude = ["active", "room"]
 
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+        if start_date and end_date and end_date <= start_date:
+            self.add_error("end_date", "Check out date must be after check in date.")
+        return cleaned_data
+
 
 class PackageBookingForm(ModelForm):
 

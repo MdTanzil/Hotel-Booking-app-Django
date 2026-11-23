@@ -18,6 +18,16 @@
        
         <div class="row">
             <div class="col-md-12">
+                <div class="p-3 mb-4 text-center" style="background: #f8f9fa; border: 1px solid #e9ecef;">
+                    <h4 class="mb-1">{{ room.room_name }}</h4>
+                    <p class="mb-1"><span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span></p>
+                    <p class="mb-0" id="stay-total" data-price="{{ room.room_price }}">Pick your dates to see the total for your stay.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
                 <form action="" method="post">
                     {% csrf_token %}
                     {{ form|crispy }}
@@ -29,4 +39,27 @@
             </div>
         </div>
     </div>
+    <script>
+    (function () {
+        var totalEl = document.getElementById('stay-total');
+        var price = parseFloat(totalEl.getAttribute('data-price'));
+        var startInput = document.getElementById('id_start_date');
+        var endInput = document.getElementById('id_end_date');
+        function updateTotal() {
+            if (!startInput.value || !endInput.value) {
+                totalEl.textContent = 'Pick your dates to see the total for your stay.';
+                return;
+            }
+            var nights = Math.round((new Date(endInput.value) - new Date(startInput.value)) / 86400000);
+            if (nights < 1) {
+                totalEl.textContent = 'Check out date must be after check in date.';
+                return;
+            }
+            totalEl.textContent = 'Total for ' + nights + ' night' + (nights === 1 ? '' : 's') + ': $' + (price * nights).toFixed(2);
+        }
+        startInput.addEventListener('change', updateTotal);
+        endInput.addEventListener('change', updateTotal);
+        updateTotal();
+    })();
+    </script>
 {% endblock body %}
