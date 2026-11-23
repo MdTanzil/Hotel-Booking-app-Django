@@ -26,6 +26,15 @@
     <link rel="stylesheet" href="{% static 'css/flaticon.css' %}">
     <link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+      /* Keep the navbar on one row when signed in (extra links: My Bookings, Admin Panel, Logout). */
+      @media (min-width: 992px) {
+        .ftco-navbar-light .navbar-nav > .nav-item > .nav-link {
+          padding-left: 0.55rem;
+          padding-right: 0.55rem;
+        }
+      }
+    </style>
   </head>
   <body>
     {% include 'navbar.html' %}
