@@ -21,7 +21,7 @@
                 <form action="" method="post">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger rounded-0 p-6">Yes, cancel this booking</button>
-                    <a href="{% url 'hotelbooking:my-bookings' %}" class="btn btn-secondary rounded-0 p-6 ml-2">Keep my booking</a>
+                    <a href="{% if back_url %}{{ back_url }}{% else %}{% url 'hotelbooking:my-bookings' %}{% endif %}" class="btn btn-secondary rounded-0 p-6 ml-2">Keep my booking</a>
                 </form>
             </div>
         </div>

@@ -8,6 +8,11 @@ from datetime import datetime
 
 class BookingForm(ModelForm):
     guest_name = forms.CharField(required=True, label="Name")
+    email = forms.EmailField(
+        required=True,
+        label="Email",
+        help_text="Your confirmation and booking reference will be sent here.",
+    )
     start_date = forms.DateField(
         required=True,
         label="Check in Date",
@@ -18,6 +23,19 @@ class BookingForm(ModelForm):
         label="Check out Date",
         widget=forms.DateInput(attrs={"type": "date", "min": datetime.now().date()}),
     )
+    payment_method = forms.ChoiceField(
+        label="How would you like to pay?",
+        choices=Booking.PAYMENT_METHOD_CHOICES,
+        widget=forms.RadioSelect,
+        initial=Booking.PAY_AT_PROPERTY,
+    )
+
+    def __init__(self, *args, stripe_available=True, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not stripe_available:
+            self.fields["payment_method"].choices = [
+                (Booking.PAY_AT_PROPERTY, "Pay at the hotel")
+            ]
 
     class Meta:
         model = Booking
@@ -33,10 +51,37 @@ class BookingForm(ModelForm):
 
 
 class PackageBookingForm(ModelForm):
+    email = forms.EmailField(
+        required=True,
+        label="Email",
+        help_text="Your confirmation and booking reference will be sent here.",
+    )
+    payment_method = forms.ChoiceField(
+        label="How would you like to pay?",
+        choices=Package_Booking.PAYMENT_METHOD_CHOICES,
+        widget=forms.RadioSelect,
+        initial=Package_Booking.PAY_AT_PROPERTY,
+    )
+
+    def __init__(self, *args, stripe_available=True, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not stripe_available:
+            self.fields["payment_method"].choices = [
+                (Package_Booking.PAY_AT_PROPERTY, "Pay at the hotel")
+            ]
 
     class Meta:
         model = Package_Booking
         exclude = ["package", "active", "user", "reference", "status", "payment_status"]
+
+
+class FindBookingForm(forms.Form):
+    reference = forms.CharField(
+        label="Booking reference",
+        max_length=12,
+        help_text="For example HB-XXXXXX — it was in your confirmation message.",
+    )
+    email = forms.EmailField(label="Email used for the booking")
 
 
 class ChangeDatesForm(ModelForm):

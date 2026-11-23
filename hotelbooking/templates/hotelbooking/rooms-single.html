@@ -89,11 +89,15 @@
                 <p>No reviews yet — be the first to share your stay.</p>
               {% endif %}
               <h4 class="mt-5 mb-3">{% if user_review %}Update your review{% else %}Write a review{% endif %}</h4>
+              {% if user.is_authenticated %}
               <form action="{% url 'hotelbooking:add-review' room.pk %}" method="post">
                 {% csrf_token %}
                 {{ review_form|crispy }}
                 <button type="submit" class="btn btn-primary">{% if user_review %}Update review{% else %}Post review{% endif %}</button>
               </form>
+              {% else %}
+              <p><a href="{% url 'account_login' %}?next={{ request.path }}">Sign in</a> to write a review.</p>
+              {% endif %}
             </div>
           </div>
         </div>

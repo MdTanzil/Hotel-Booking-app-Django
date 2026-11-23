@@ -37,14 +37,14 @@ def _send(to_email, subject, template, context):
         return False
 
 
-def _user_email(booking):
-    return booking.user.email if booking.user else None
+def _contact_email(booking):
+    return booking.contact_email
 
 
 def send_booking_confirmation(booking):
     nights = _nights(booking)
     return _send(
-        _user_email(booking),
+        _contact_email(booking),
         f"Your booking is confirmed - {booking.reference}",
         "hotelbooking/emails/booking_confirmation.txt",
         {
@@ -57,7 +57,7 @@ def send_booking_confirmation(booking):
 
 def send_package_booking_confirmation(booking):
     return _send(
-        _user_email(booking),
+        _contact_email(booking),
         f"Your package booking is confirmed - {booking.reference}",
         "hotelbooking/emails/package_booking_confirmation.txt",
         {"booking": booking},
@@ -66,7 +66,7 @@ def send_package_booking_confirmation(booking):
 
 def send_booking_cancellation(booking):
     return _send(
-        _user_email(booking),
+        _contact_email(booking),
         f"Your booking is cancelled - {booking.reference}",
         "hotelbooking/emails/booking_cancellation.txt",
         {"booking": booking},
@@ -75,7 +75,7 @@ def send_booking_cancellation(booking):
 
 def send_package_booking_cancellation(booking):
     return _send(
-        _user_email(booking),
+        _contact_email(booking),
         f"Your package booking is cancelled - {booking.reference}",
         "hotelbooking/emails/package_booking_cancellation.txt",
         {"booking": booking},
@@ -85,7 +85,7 @@ def send_package_booking_cancellation(booking):
 def send_booking_dates_changed(booking):
     nights = _nights(booking)
     return _send(
-        _user_email(booking),
+        _contact_email(booking),
         f"Your booking dates changed - {booking.reference}",
         "hotelbooking/emails/booking_dates_changed.txt",
         {

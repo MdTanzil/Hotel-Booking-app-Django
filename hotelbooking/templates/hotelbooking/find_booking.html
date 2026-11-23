@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}
+    Find My Booking
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="Find My Booking" %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <p>Enter your booking reference and the email you booked with to view, cancel or pay for your booking — no account needed.</p>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary rounded-0 p-6">Find my booking</button>
+                </form>
+                {% if user.is_authenticated %}
+                <p class="mt-3">Signed in? Your bookings are also on the <a href="{% url 'hotelbooking:my-bookings' %}">My Bookings</a> page.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock body %}

@@ -26,6 +26,7 @@
             <p><strong>What's included:</strong>
             {% for item in package.package_item.all %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
             {% endif %}
+            <p>No account needed — book as a guest with your email, or <a href="{% url 'account_login' %}?next={{ request.path }}">sign in</a> to keep your bookings in one place.</p>
             <form action="" method="post" >
                 {% csrf_token %}
                 {{ form|crispy}}

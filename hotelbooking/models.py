@@ -174,12 +174,24 @@ class Booking(BaseModel):
         (PAYMENT_UNPAID, "Unpaid"),
         (PAYMENT_PAID, "Paid"),
     ]
+    PAY_AT_PROPERTY = "pay_at_property"
+    PAY_ONLINE = "online"
+    PAYMENT_METHOD_CHOICES = [
+        (PAY_AT_PROPERTY, "Pay at the hotel"),
+        (PAY_ONLINE, "Pay online now by card"),
+    ]
 
     start_date = models.DateField()
     end_date = models.DateField()
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     guest_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
+    email = models.EmailField(blank=True, default="")
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHOD_CHOICES,
+        default=PAY_AT_PROPERTY,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -194,6 +206,14 @@ class Booking(BaseModel):
     payment_status = models.CharField(
         max_length=10, choices=PAYMENT_CHOICES, default=PAYMENT_UNPAID
     )
+
+    @property
+    def contact_email(self):
+        if self.email:
+            return self.email
+        if self.user:
+            return self.user.email
+        return ""
 
     def save(self, *args, **kwargs):
         if not self.reference:
@@ -221,10 +241,22 @@ class Package_Booking(BaseModel):
         (PAYMENT_UNPAID, "Unpaid"),
         (PAYMENT_PAID, "Paid"),
     ]
+    PAY_AT_PROPERTY = "pay_at_property"
+    PAY_ONLINE = "online"
+    PAYMENT_METHOD_CHOICES = [
+        (PAY_AT_PROPERTY, "Pay at the hotel"),
+        (PAY_ONLINE, "Pay online now by card"),
+    ]
 
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=50)
+    email = models.EmailField(blank=True, default="")
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHOD_CHOICES,
+        default=PAY_AT_PROPERTY,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
@@ -239,6 +271,14 @@ class Package_Booking(BaseModel):
     payment_status = models.CharField(
         max_length=10, choices=PAYMENT_CHOICES, default=PAYMENT_UNPAID
     )
+
+    @property
+    def contact_email(self):
+        if self.email:
+            return self.email
+        if self.user:
+            return self.user.email
+        return ""
 
     def save(self, *args, **kwargs):
         if not self.reference:

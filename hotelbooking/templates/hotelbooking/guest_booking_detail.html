@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Booking {{ booking.reference }}
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="My Booking" %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <h2 class="mb-4">Booking {{ booking.reference }}</h2>
+                {% if kind == "room" %}
+                <p><strong>{{ booking.room.room_name }}</strong><br>
+                {{ booking.start_date }} to {{ booking.end_date }} ({{ booking.nights }} night{{ booking.nights|pluralize }}, total ${{ booking.stay_total }})<br>
+                Guest: {{ booking.guest_name }}<br>
+                Email: {{ booking.contact_email }}</p>
+                {% else %}
+                <p><strong>{{ booking.package.name }}</strong> package — ${{ booking.package.price }} per night<br>
+                Guest: {{ booking.name }}<br>
+                Email: {{ booking.contact_email }}</p>
+                {% endif %}
+                <p>Status: <strong>{{ booking.get_status_display }}</strong><br>
+                Payment: <strong>{{ booking.get_payment_status_display }}</strong> ({{ booking.get_payment_method_display }})</p>
+                {% if booking.status == "confirmed" %}
+                <div class="mt-4">
+                    <a href="{% url 'hotelbooking:guest-cancel-booking' booking.reference %}" class="btn btn-outline-danger rounded-0 p-6">Cancel this booking</a>
+                    {% if booking.payment_status == "unpaid" and stripe_configured %}
+                    <form action="{% url 'hotelbooking:guest-pay-booking' booking.reference %}" method="post" class="d-inline ml-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success rounded-0 p-6">Pay now</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% if kind == "room" %}
+                <p class="mt-4">Room bookings can be cancelled free of charge until 2 days before check-in. To change your dates, please <a href="{% url 'hotelbooking:contact-us' %}">contact us</a> with your booking reference.</p>
+                {% else %}
+                <p class="mt-4">Package bookings can be cancelled free of charge at any time.</p>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock body %}

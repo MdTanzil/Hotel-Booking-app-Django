@@ -17,6 +17,10 @@ from .views import (
     AddReviewView,
     DeleteReviewView,
     PoliciesFaqView,
+    FindBookingView,
+    GuestBookingDetailView,
+    GuestCancelBookingView,
+    GuestPayView,
     RestaurantsTemplateView,
     AboutUsTemplateView,
     BlogTemplateView,
@@ -83,6 +87,22 @@ urlpatterns = [
     path('about-us/', AboutUsTemplateView.as_view(),name='about-us'),
     path('blog/', BlogTemplateView.as_view(),name='blog'),
     path('policies/', PoliciesFaqView.as_view(), name='policies-faq'),
+    path("find-booking/", FindBookingView.as_view(), name="find-booking"),
+    path(
+        "find-booking/<str:reference>/",
+        GuestBookingDetailView.as_view(),
+        name="guest-booking-detail",
+    ),
+    path(
+        "find-booking/<str:reference>/cancel/",
+        GuestCancelBookingView.as_view(),
+        name="guest-cancel-booking",
+    ),
+    path(
+        "find-booking/<str:reference>/pay/",
+        GuestPayView.as_view(),
+        name="guest-pay-booking",
+    ),
     path('contact/', ContactFormView.as_view(),name='contact-us'),
     
     

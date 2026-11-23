@@ -4,6 +4,7 @@ import stripe
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, date, timedelta
@@ -12,7 +13,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView
 from .models import Room, Package, Booking, Room_category, Package_Booking, Review
 from django.db.models import Q, Avg
-from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm
+from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm
 from .emails import (
     send_booking_confirmation,
     send_package_booking_confirmation,
@@ -173,7 +174,7 @@ class PackageTemplate(ListView):
         )
 
 
-class RoomDetails(LoginRequiredMixin, TemplateView):
+class RoomDetails(TemplateView):
 
     def get(self, request, pk):
         room = Room.objects.get(id=pk)
@@ -274,42 +275,80 @@ class PoliciesFaqView(TemplateView):
     template_name = "hotelbooking/policies_faq.html"
 
 
-class CreateBookingRoom(LoginRequiredMixin, View):
+class CreateBookingRoom(View):
     def get(self, request, pk):
         room = Room.objects.get(id=pk)
-        form = BookingForm()
+        initial = {}
+        if request.user.is_authenticated and request.user.email:
+            initial["email"] = request.user.email
+        form = BookingForm(
+            initial=initial, stripe_available=stripe_configured()
+        )
         template_name = "hotelbooking/createBooking.html"
         context = {"form": form, "id": pk, "room": room}
         return render(request, template_name, context)
 
     def post(self, request, pk):
         room = Room.objects.get(id=pk)
-        form = BookingForm(request.POST, instance=Booking(room=room))
+        form = BookingForm(
+            request.POST,
+            instance=Booking(room=room),
+            stripe_available=stripe_configured(),
+        )
         if form.is_valid():
             booking = form.save(commit=False)
-            booking.user = request.user
+            if request.user.is_authenticated:
+                booking.user = request.user
             booking.save()
             send_booking_confirmation(booking)
             nights = (
                 form.cleaned_data["end_date"] - form.cleaned_data["start_date"]
             ).days
             total = room.room_price * nights
-            messages.success(
-                request,
-                f"Your booking for {room.room_name} is confirmed for "
-                f"{form.cleaned_data['start_date']} to "
-                f"{form.cleaned_data['end_date']} ({nights} night"
-                f"{'s' if nights != 1 else ''}, total ${total}). "
-                f"Your booking reference is {booking.reference}. "
-                "Our team will call you for confirmation.",
+            if (
+                booking.payment_method == Booking.PAY_ONLINE
+                and stripe_configured()
+            ):
+                try:
+                    session = create_checkout_session(
+                        request, booking, "room"
+                    )
+                    if getattr(session, "url", None):
+                        request.session["guest_booking_ref"] = booking.reference
+                        return redirect(session.url)
+                except Exception:
+                    logger.exception(
+                        "Stripe Checkout failed for %s", booking.reference
+                    )
+                messages.warning(
+                    request,
+                    "Your booking is confirmed, but online payment could "
+                    "not be started — please pay at the hotel or try again "
+                    "from My Bookings.",
+                )
+            else:
+                messages.success(
+                    request,
+                    f"Your booking for {room.room_name} is confirmed for "
+                    f"{form.cleaned_data['start_date']} to "
+                    f"{form.cleaned_data['end_date']} ({nights} night"
+                    f"{'s' if nights != 1 else ''}, total ${total}). "
+                    f"Your booking reference is {booking.reference}. "
+                    "Our team will call you for confirmation.",
+                )
+            if request.user.is_authenticated:
+                return redirect("hotelbooking:rooms")
+            request.session["guest_booking_ref"] = booking.reference
+            return redirect(
+                "hotelbooking:guest-booking-detail",
+                reference=booking.reference,
             )
-            return redirect("hotelbooking:rooms")
         template_name = "hotelbooking/createBooking.html"
         context = {"form": form, "id": pk, "room": room}
         return render(request, template_name, context)
 
 
-class PackageBookingCreateView(LoginRequiredMixin, View):
+class PackageBookingCreateView(View):
     def get(self, request, pk):
         package = Package.objects.get(id=pk)
         if not package.is_current:
@@ -317,7 +356,12 @@ class PackageBookingCreateView(LoginRequiredMixin, View):
                 request, "This package is no longer available."
             )
             return redirect("hotelbooking:packages")
-        form = PackageBookingForm()
+        initial = {}
+        if request.user.is_authenticated and request.user.email:
+            initial["email"] = request.user.email
+        form = PackageBookingForm(
+            initial=initial, stripe_available=stripe_configured()
+        )
         template_name = "hotelbooking/create_package_booking.html"
         context = {"form": form, "id": pk, "package": package}
         return render(request, template_name, context)
@@ -330,20 +374,54 @@ class PackageBookingCreateView(LoginRequiredMixin, View):
             )
             return redirect("hotelbooking:packages")
         form = PackageBookingForm(
-            request.POST, instance=Package_Booking(package=package)
+            request.POST,
+            instance=Package_Booking(package=package),
+            stripe_available=stripe_configured(),
         )
         if form.is_valid():
             package_booking = form.save(commit=False)
-            package_booking.user = request.user
+            if request.user.is_authenticated:
+                package_booking.user = request.user
             package_booking.save()
             send_package_booking_confirmation(package_booking)
-            messages.success(
-                request,
-                f"Your booking for the {package.name} package is confirmed. "
-                f"Your booking reference is {package_booking.reference}. "
-                "Our team will call you for confirmation.",
+            if (
+                package_booking.payment_method == Package_Booking.PAY_ONLINE
+                and stripe_configured()
+            ):
+                try:
+                    session = create_checkout_session(
+                        request, package_booking, "package"
+                    )
+                    if getattr(session, "url", None):
+                        request.session["guest_booking_ref"] = (
+                            package_booking.reference
+                        )
+                        return redirect(session.url)
+                except Exception:
+                    logger.exception(
+                        "Stripe Checkout failed for %s",
+                        package_booking.reference,
+                    )
+                messages.warning(
+                    request,
+                    "Your booking is confirmed, but online payment could "
+                    "not be started — please pay at the hotel or try again "
+                    "from My Bookings.",
+                )
+            else:
+                messages.success(
+                    request,
+                    f"Your booking for the {package.name} package is confirmed. "
+                    f"Your booking reference is {package_booking.reference}. "
+                    "Our team will call you for confirmation.",
+                )
+            if request.user.is_authenticated:
+                return redirect("hotelbooking:packages")
+            request.session["guest_booking_ref"] = package_booking.reference
+            return redirect(
+                "hotelbooking:guest-booking-detail",
+                reference=package_booking.reference,
             )
-            return redirect("hotelbooking:packages")
         template_name = "hotelbooking/create_package_booking.html"
         context = {"form": form, "id": pk, "package": package}
         return render(request, template_name, context)
@@ -623,3 +701,211 @@ class ContactFormView(FormView):
         return super().form_valid(form)
 
     
+
+def _find_booking_by_reference(reference):
+    """Return ("room", booking) or ("package", booking) for a reference,
+    or (None, None) when nothing matches."""
+    booking = Booking.objects.filter(reference=reference).first()
+    if booking:
+        return "room", booking
+    booking = Package_Booking.objects.filter(reference=reference).first()
+    if booking:
+        return "package", booking
+    return None, None
+
+
+def _guest_can_access(request, booking):
+    """A booking may be viewed when the visitor verified it through the
+    find-my-booking lookup (session holds the reference), owns it, or is
+    staff."""
+    if request.session.get("guest_booking_ref") == booking.reference:
+        return True
+    if request.user.is_authenticated and (
+        booking.user == request.user or request.user.is_staff
+    ):
+        return True
+    return False
+
+
+class FindBookingView(View):
+    def get(self, request):
+        form = FindBookingForm()
+        return render(
+            request, "hotelbooking/find_booking.html", {"form": form}
+        )
+
+    def post(self, request):
+        form = FindBookingForm(request.POST)
+        if form.is_valid():
+            reference = form.cleaned_data["reference"].strip().upper()
+            email = form.cleaned_data["email"].strip().lower()
+            _kind, booking = _find_booking_by_reference(reference)
+            if booking and booking.contact_email.lower() == email:
+                request.session["guest_booking_ref"] = booking.reference
+                return redirect(
+                    "hotelbooking:guest-booking-detail",
+                    reference=booking.reference,
+                )
+            messages.error(
+                request,
+                "No booking found with that reference and email. Please "
+                "check both and try again.",
+            )
+        return render(
+            request, "hotelbooking/find_booking.html", {"form": form}
+        )
+
+
+class GuestBookingDetailView(View):
+    def get(self, request, reference):
+        kind, booking = _find_booking_by_reference(reference)
+        if not booking:
+            raise Http404("Booking not found")
+        if not _guest_can_access(request, booking):
+            messages.error(
+                request,
+                "Please enter your booking reference and email to view "
+                "this booking.",
+            )
+            return redirect("hotelbooking:find-booking")
+        if kind == "room":
+            booking.nights = (booking.end_date - booking.start_date).days
+            booking.stay_total = booking.room.room_price * booking.nights
+        context = {
+            "booking": booking,
+            "kind": kind,
+            "stripe_configured": stripe_configured(),
+        }
+        return render(
+            request, "hotelbooking/guest_booking_detail.html", context
+        )
+
+
+class GuestCancelBookingView(View):
+    def get(self, request, reference):
+        kind, booking = _find_booking_by_reference(reference)
+        if not booking:
+            raise Http404("Booking not found")
+        if not _guest_can_access(request, booking):
+            messages.error(
+                request,
+                "Please enter your booking reference and email to view "
+                "this booking.",
+            )
+            return redirect("hotelbooking:find-booking")
+        if booking.status == Booking.STATUS_CANCELLED:
+            messages.info(
+                request, f"Booking {booking.reference} is already cancelled."
+            )
+            return redirect(
+                "hotelbooking:guest-booking-detail", reference=reference
+            )
+        if kind == "room" and booking.start_date - date.today() < timedelta(
+            days=2
+        ):
+            messages.error(
+                request,
+                "This booking can no longer be cancelled online. Free "
+                "cancellation ends 2 days before check-in — please contact us.",
+            )
+            return redirect(
+                "hotelbooking:guest-booking-detail", reference=reference
+            )
+        if kind == "room":
+            booking.nights = (booking.end_date - booking.start_date).days
+            booking.stay_total = booking.room.room_price * booking.nights
+        context = {
+            "booking": booking,
+            "kind": kind,
+            "back_url": reverse(
+                "hotelbooking:guest-booking-detail", args=[reference]
+            ),
+        }
+        return render(request, "hotelbooking/confirm_cancel.html", context)
+
+    def post(self, request, reference):
+        kind, booking = _find_booking_by_reference(reference)
+        if not booking:
+            raise Http404("Booking not found")
+        if not _guest_can_access(request, booking):
+            messages.error(
+                request,
+                "Please enter your booking reference and email to view "
+                "this booking.",
+            )
+            return redirect("hotelbooking:find-booking")
+        if booking.status == Booking.STATUS_CANCELLED:
+            messages.info(
+                request, f"Booking {booking.reference} is already cancelled."
+            )
+        elif kind == "room" and booking.start_date - date.today() < timedelta(
+            days=2
+        ):
+            messages.error(
+                request,
+                "This booking can no longer be cancelled online. Free "
+                "cancellation ends 2 days before check-in — please contact us.",
+            )
+        else:
+            booking.status = Booking.STATUS_CANCELLED
+            booking.save()
+            if kind == "room":
+                send_booking_cancellation(booking)
+            else:
+                send_package_booking_cancellation(booking)
+            messages.success(
+                request, f"Booking {booking.reference} has been cancelled."
+            )
+        return redirect(
+            "hotelbooking:guest-booking-detail", reference=reference
+        )
+
+
+class GuestPayView(View):
+    def post(self, request, reference):
+        kind, booking = _find_booking_by_reference(reference)
+        if not booking:
+            raise Http404("Booking not found")
+        if not _guest_can_access(request, booking):
+            messages.error(
+                request,
+                "Please enter your booking reference and email to view "
+                "this booking.",
+            )
+            return redirect("hotelbooking:find-booking")
+        if booking.status != Booking.STATUS_CONFIRMED:
+            messages.error(request, "This booking cannot be paid.")
+            return redirect(
+                "hotelbooking:guest-booking-detail", reference=reference
+            )
+        if booking.payment_status == Booking.PAYMENT_PAID:
+            messages.info(request, "This booking is already paid.")
+            return redirect(
+                "hotelbooking:guest-booking-detail", reference=reference
+            )
+        if not stripe_configured():
+            messages.error(
+                request,
+                "Online payment is not set up yet — please pay at the hotel.",
+            )
+            return redirect(
+                "hotelbooking:guest-booking-detail", reference=reference
+            )
+        try:
+            session = create_checkout_session(request, booking, kind)
+        except Exception:
+            logger.exception("Stripe Checkout failed for %s", reference)
+            messages.error(
+                request, "Could not start the payment. Please try again."
+            )
+            return redirect(
+                "hotelbooking:guest-booking-detail", reference=reference
+            )
+        if not getattr(session, "url", None):
+            messages.error(
+                request, "Could not start the payment. Please try again."
+            )
+            return redirect(
+                "hotelbooking:guest-booking-detail", reference=reference
+            )
+        return redirect(session.url)
