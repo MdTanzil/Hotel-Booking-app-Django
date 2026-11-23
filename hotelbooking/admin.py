@@ -3,6 +3,7 @@ from .models import (
     Room_category,
     Room_view,
     Room,
+    RoomAmenity,
     Package_item,
     Package,
     Booking,
@@ -24,6 +25,11 @@ class Room_viewAdmin(admin.ModelAdmin):
     list_display = ("name", "desc")
 
 
+@admin.register(RoomAmenity)
+class RoomAmenityAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
     list_display = (
@@ -32,7 +38,10 @@ class RoomAdmin(admin.ModelAdmin):
         "max_person",
         "room_size",
         "room_category",
+        "bed_type",
+        "bathroom_type",
     )
+    filter_horizontal = ("room_view", "amenities")
 
 
 @admin.register(Package)

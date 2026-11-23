@@ -42,7 +42,39 @@ class Room_view(BaseModel):
         return self.name
 
 
+class RoomAmenity(BaseModel):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["name"]
+
+
 class Room(BaseModel):
+    BED_KING = "king"
+    BED_QUEEN = "queen"
+    BED_TWIN = "twin"
+    BED_DOUBLE = "double"
+    BED_TYPE_CHOICES = [
+        (BED_KING, "King"),
+        (BED_QUEEN, "Queen"),
+        (BED_TWIN, "Twin"),
+        (BED_DOUBLE, "Double"),
+    ]
+
+    BATH_SHOWER = "shower"
+    BATH_TUB = "tub"
+    BATH_BOTH = "both"
+    BATH_ROLLIN = "roll-in"
+    BATHROOM_TYPE_CHOICES = [
+        (BATH_SHOWER, "Walk-in shower"),
+        (BATH_TUB, "Bathtub"),
+        (BATH_BOTH, "Shower and bathtub"),
+        (BATH_ROLLIN, "Roll-in shower"),
+    ]
+
     room_name = models.CharField(max_length=50)
     room_price = models.DecimalField(max_digits=11, decimal_places=2)
     max_person = models.IntegerField(default=1)
@@ -51,12 +83,31 @@ class Room(BaseModel):
     room_category = models.ForeignKey(Room_category, on_delete=models.CASCADE)
     room_view = models.ManyToManyField(Room_view)
     room_bed = models.IntegerField(default=1)
+    bed_type = models.CharField(
+        max_length=10, choices=BED_TYPE_CHOICES, default=BED_KING
+    )
+    bathroom_type = models.CharField(
+        max_length=10, choices=BATHROOM_TYPE_CHOICES, default=BATH_SHOWER
+    )
+    amenities = models.ManyToManyField(RoomAmenity, blank=True)
+    whats_included = models.TextField(
+        blank=True, help_text="One item per line."
+    )
     room_image = models.ImageField(
         upload_to="rooms/", height_field=None, width_field=None, max_length=None
     )
 
     def __str__(self):
         return self.room_name
+
+    @property
+    def bed_label(self):
+        noun = "bed" if self.room_bed == 1 else "beds"
+        return f"{self.room_bed} {self.get_bed_type_display()} {noun}"
+
+    @property
+    def included_items(self):
+        return [line.strip() for line in self.whats_included.splitlines() if line.strip()]
 
 
 class Package_item(BaseModel):

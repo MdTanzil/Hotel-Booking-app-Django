@@ -46,7 +46,10 @@
                                                 {% for view in room.room_view.all %}{{ view }} <span></span>{% endfor %}
                                             </li>
                                             <li>
-                                                <span>Bed:</span> {{ room.room_bed }}
+                                                <span>Bed:</span> {{ room.bed_label }}
+                                            </li>
+                                            <li>
+                                                <span>Bathroom:</span> {{ room.get_bathroom_type_display }}
                                             </li>
                                         </ul>
                                         <hr>
@@ -109,7 +112,10 @@
                                             {% for view in room.room_view.all %}{{ view }} <span></span>{% endfor %}
                                         </li>
                                         <li>
-                                            <span>Bed:</span> {{ room.room_bed }}
+                                            <span>Bed:</span> {{ room.bed_label }}
+                                        </li>
+                                        <li>
+                                            <span>Bathroom:</span> {{ room.get_bathroom_type_display }}
                                         </li>
                                     </ul>
                                     <hr>

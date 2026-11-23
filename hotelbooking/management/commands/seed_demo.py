@@ -25,6 +25,7 @@ from hotelbooking.models import (
     Package_item,
     Review,
     Room,
+    RoomAmenity,
     Room_category,
     Room_view,
 )
@@ -45,7 +46,22 @@ VIEWS = [
     ("Pool View", "Overlooking the outdoor swimming pool."),
 ]
 
-# name, price (BDT/night), max_person, size (sqm), beds, category, views, image
+AMENITIES = [
+    "Free Wi-Fi",
+    "Air conditioning",
+    "Flat-screen TV",
+    "Mini fridge",
+    "Coffee maker",
+    "In-room safe",
+    "Hair dryer",
+    "Work desk",
+    "Blackout curtains",
+    "Private balcony",
+    "Room service",
+]
+
+# name, price (BDT/night), max_person, size (sqm), beds, bed type, bathroom
+# type, category, views, image, description, amenities, what's included
 ROOMS = [
     (
         "Deluxe King Room",
@@ -53,11 +69,17 @@ ROOMS = [
         2,
         35,
         1,
+        "king",
+        "shower",
         "Deluxe",
         ["City View"],
         "room-1.jpg",
         "A bright, comfortable room with a king bed, rainfall shower and "
         "a quiet corner to unwind after a day out.",
+        ["Free Wi-Fi", "Air conditioning", "Flat-screen TV", "Coffee maker",
+         "In-room safe", "Hair dryer"],
+        "Daily housekeeping\nComplimentary bottled water\n"
+        "Access to the outdoor pool\nFree on-site parking",
     ),
     (
         "Executive Twin Room",
@@ -65,11 +87,17 @@ ROOMS = [
         2,
         42,
         2,
+        "twin",
+        "shower",
         "Executive",
         ["City View", "Pool View"],
         "room-2.jpg",
         "Two comfortable beds, a proper work desk and fast Wi-Fi — ideal "
         "for business trips and friends travelling together.",
+        ["Free Wi-Fi", "Air conditioning", "Flat-screen TV", "Work desk",
+         "Coffee maker", "In-room safe"],
+        "Daily housekeeping\nComplimentary bottled water\n"
+        "Work desk with task lighting\nAccess to the outdoor pool",
     ),
     (
         "Family Suite",
@@ -77,11 +105,17 @@ ROOMS = [
         4,
         60,
         2,
+        "queen",
+        "both",
         "Family",
         ["Garden View"],
         "room-3.jpg",
         "Plenty of space for the whole family, with two bedrooms, a "
         "sitting area and a garden-facing balcony.",
+        ["Free Wi-Fi", "Air conditioning", "Flat-screen TV", "Mini fridge",
+         "Coffee maker", "In-room safe", "Hair dryer"],
+        "Daily housekeeping\nComplimentary bottled water\n"
+        "Garden-facing balcony\nAccess to the outdoor pool and kids' area",
     ),
     (
         "Premium Suite",
@@ -89,11 +123,18 @@ ROOMS = [
         3,
         75,
         1,
+        "king",
+        "both",
         "Suite",
         ["Sea View", "Pool View"],
         "room-4.jpg",
         "Our finest suite: a separate living room, a soaking tub and "
         "floor-to-ceiling windows over the sea.",
+        ["Free Wi-Fi", "Air conditioning", "Flat-screen TV", "Mini fridge",
+         "Coffee maker", "In-room safe", "Hair dryer", "Private balcony",
+         "Room service"],
+        "Daily housekeeping\nWelcome drink on arrival\n"
+        "Soaking tub and sea-facing lounge\nAccess to the outdoor pool and spa",
     ),
     (
         "Deluxe Queen Room",
@@ -101,11 +142,17 @@ ROOMS = [
         2,
         38,
         1,
+        "queen",
+        "tub",
         "Deluxe",
         ["Garden View"],
         "room-5.jpg",
         "A calm queen room looking over the gardens, with a deep soaking "
         "tub and blackout curtains for a good night's sleep.",
+        ["Free Wi-Fi", "Air conditioning", "Flat-screen TV", "Coffee maker",
+         "In-room safe", "Hair dryer", "Blackout curtains"],
+        "Daily housekeeping\nComplimentary bottled water\n"
+        "Deep soaking tub\nAccess to the outdoor pool",
     ),
     (
         "Executive King Suite",
@@ -113,11 +160,18 @@ ROOMS = [
         3,
         68,
         1,
+        "king",
+        "both",
         "Executive",
         ["Sea View"],
         "room-6.jpg",
         "A king suite with a sea-facing lounge, a work area and a "
         "private balcony for evening coffee.",
+        ["Free Wi-Fi", "Air conditioning", "Flat-screen TV", "Mini fridge",
+         "Work desk", "Coffee maker", "In-room safe", "Hair dryer",
+         "Private balcony"],
+        "Daily housekeeping\nComplimentary bottled water\n"
+        "Sea-facing lounge and work area\nAccess to the outdoor pool",
     ),
 ]
 
@@ -256,7 +310,25 @@ class Command(BaseCommand):
         }
 
         rooms = {}
-        for name, price, persons, size, beds, cat, view_names, image, desc in ROOMS:
+        amenities = {
+            name: RoomAmenity.objects.get_or_create(name=name)[0]
+            for name in AMENITIES
+        }
+        for (
+            name,
+            price,
+            persons,
+            size,
+            beds,
+            bed_type,
+            bathroom_type,
+            cat,
+            view_names,
+            image,
+            desc,
+            amenity_names,
+            included,
+        ) in ROOMS:
             room, _created = Room.objects.get_or_create(
                 room_name=name,
                 defaults={
@@ -268,7 +340,14 @@ class Command(BaseCommand):
                     "room_desc": f"<p>{desc}</p>",
                 },
             )
+            # Set on every run (not just on create) so rooms seeded before
+            # these fields existed still get them.
+            room.bed_type = bed_type
+            room.bathroom_type = bathroom_type
+            room.whats_included = included
+            room.save()
             room.room_view.set(views[v] for v in view_names)
+            room.amenities.set(amenities[a] for a in amenity_names)
             self._ensure_image(room.room_image, image)
             rooms[name] = room
             self.stdout.write(f"Room: {name}")
