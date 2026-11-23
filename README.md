@@ -52,28 +52,6 @@ python manage.py runserver
 
 Then open http://127.0.0.1:8000/ and sign in with a demo account above.
 
-## Deploy on Vercel
+---
 
-1. Create a PostgreSQL database (a free [Neon](https://neon.tech) project
-   works) and copy the **direct** connection string — in Neon's Connect
-   modal leave "Connection pooling" OFF, so the hostname has no `-pooler`
-   and the string ends with `?sslmode=require`.
-2. Import this repository at [vercel.com/new](https://vercel.com/new).
-3. Set these environment variables and deploy:
-
-| Variable | Value |
-| --- | --- |
-| `DATABASE_URL` | Your Neon direct connection string |
-| `DJANGO_SECRET_KEY` | A long random string |
-| `DJANGO_DEBUG` | `False` |
-
-The build (`build.py`) runs migrations, collects static files, and seeds
-the demo rooms, packages and accounts. `ALLOWED_HOSTS` and
-`CSRF_TRUSTED_ORIGINS` default to `*.vercel.app`, so they only need
-setting for a custom domain.
-
-To create a personal admin account against the live database:
-
-```bash
-DATABASE_URL='<your Neon direct string>' python manage.py createsuperuser
-```
+© 2026 Md Tanzil. All rights reserved.
