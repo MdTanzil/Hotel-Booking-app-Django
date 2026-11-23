@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import Booking, Package_Booking, Contact, Review
+from .models import Booking, Package_Booking, Contact, Review, Lead
 from datetime import datetime
 
 # Create the form class.
@@ -136,3 +136,50 @@ class ReviewForm(ModelForm):
         model = Review
         fields = ["rating", "text"]
 
+
+
+class LeadForm(ModelForm):
+    start_date = forms.DateField(
+        required=True,
+        label="Arrival date",
+        widget=forms.DateInput(attrs={"type": "date", "min": datetime.now().date()}),
+    )
+    end_date = forms.DateField(
+        required=True,
+        label="Departure date",
+        widget=forms.DateInput(attrs={"type": "date", "min": datetime.now().date()}),
+    )
+    message = forms.CharField(
+        label="Tell us about your event",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 4}),
+        help_text="Anything that helps us prepare a quote: occasion, schedule, dining or meeting needs.",
+    )
+
+    class Meta:
+        model = Lead
+        fields = [
+            "name",
+            "email",
+            "phone_number",
+            "event_type",
+            "start_date",
+            "end_date",
+            "adult_member",
+            "child",
+            "rooms_needed",
+            "message",
+        ]
+        labels = {
+            "adult_member": "Adults",
+            "child": "Children",
+            "rooms_needed": "Rooms needed",
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("start_date")
+        end_date = cleaned_data.get("end_date")
+        if start_date and end_date and end_date <= start_date:
+            self.add_error("end_date", "Departure date must be after arrival date.")
+        return cleaned_data

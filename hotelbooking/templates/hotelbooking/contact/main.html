@@ -12,15 +12,31 @@ Contact
             <div class="row">
                 <div class="col-md-12 ">
                 <h1 >Contact Form</h1>
-                
+
                 </div>
                 <div class="col-md-12">
                     <form action="" method="post">
                         {% csrf_token %}
+                        <input type="hidden" name="form_kind" value="message">
                         {{ form|crispy }}
                         <div class="pb-4 mb-6 mt-3 mb-4 text-center">
                             <button type="submit" class ="btn btn-primary  btn-lg rounded-1 p-6">Submit</button>
-    
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr class="my-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Planning a group stay, wedding or event?</h2>
+                    <p>For groups, weddings and corporate stays, tell us about your plans and our team will prepare a tailored quote — rooms, dining and event space in one reply.</p>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_kind" value="group">
+                        {{ lead_form|crispy }}
+                        <div class="pb-4 mb-6 mt-3 mb-4 text-center">
+                            <button type="submit" class ="btn btn-primary btn-lg rounded-1 p-6">Send group enquiry</button>
                         </div>
                     </form>
                 </div>

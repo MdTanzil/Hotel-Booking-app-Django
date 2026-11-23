@@ -88,7 +88,19 @@ class GuestAdmin(admin.ModelAdmin):
 
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        "name",
+        "event_type",
+        "start_date",
+        "end_date",
+        "adult_member",
+        "child",
+        "rooms_needed",
+        "status",
+        "created_at",
+    )
+    list_filter = ("status", "event_type")
+    search_fields = ["name", "email", "message"]
 
 
 @admin.register(Contact)

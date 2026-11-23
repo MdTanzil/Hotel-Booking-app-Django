@@ -335,18 +335,47 @@ class Guest(BaseModel):
 
 
 class Lead(BaseModel):
+    """A group/wedding/event enquiry (RFP) from the contact page."""
+
+    EVENT_WEDDING = "wedding"
+    EVENT_CORPORATE = "corporate"
+    EVENT_FAMILY = "family"
+    EVENT_GROUP = "group"
+    EVENT_OTHER = "other"
+    EVENT_CHOICES = [
+        (EVENT_WEDDING, "Wedding"),
+        (EVENT_CORPORATE, "Corporate / business"),
+        (EVENT_FAMILY, "Family gathering"),
+        (EVENT_GROUP, "Group stay"),
+        (EVENT_OTHER, "Other event"),
+    ]
+    STATUS_NEW = "new"
+    STATUS_CONTACTED = "contacted"
+    STATUS_CLOSED = "closed"
+    STATUS_CHOICES = [
+        (STATUS_NEW, "New"),
+        (STATUS_CONTACTED, "Contacted"),
+        (STATUS_CLOSED, "Closed"),
+    ]
+
+    name = models.CharField(max_length=100, default="")
+    email = models.EmailField(default="")
+    phone_number = models.CharField(max_length=20, blank=True, default="")
+    event_type = models.CharField(
+        max_length=10, choices=EVENT_CHOICES, default=EVENT_GROUP
+    )
     start_date = models.DateField()
     end_date = models.DateField()
     adult_member = models.IntegerField(default=1)
     child = models.IntegerField(default=0)
-    room_01 = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="room_01")
-    room_02 = models.ForeignKey(
-        Room, on_delete=models.CASCADE, blank=True, null=True, related_name="room_02"
+    rooms_needed = models.IntegerField(default=1)
+    message = models.TextField(blank=True, default="")
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default=STATUS_NEW
     )
-    room_03 = models.ForeignKey(
-        Room, on_delete=models.CASCADE, blank=True, null=True, related_name="room_03"
-    )
-    guest = models.ManyToManyField(Guest)
+
+    def __str__(self):
+        return f"{self.name} — {self.get_event_type_display()} ({self.start_date})"
 
 class Contact(BaseModel):
     name = models.CharField(max_length=100)

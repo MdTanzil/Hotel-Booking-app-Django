@@ -13,7 +13,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
 from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost
 from django.db.models import Q, Avg
-from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm
+from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm, LeadForm
 from .emails import (
     send_booking_confirmation,
     send_package_booking_confirmation,
@@ -662,15 +662,36 @@ class BlogDetailView(DetailView):
     def get_queryset(self):
         return BlogPost.objects.filter(published=True)
 
-class ContactFormView(FormView):
-    form_class = ContactForm
+class ContactFormView(View):
     template_name = "hotelbooking/contact/main.html"
-    success_url = reverse_lazy('hotelbooking:home')  # Redirect after a successful form submission
 
-    def form_valid(self, form):
-        # Save the form data to the database
-        form.save()
-        return super().form_valid(form)
+    def get(self, request):
+        context = {"form": ContactForm(), "lead_form": LeadForm()}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        if request.POST.get("form_kind") == "group":
+            lead_form = LeadForm(request.POST)
+            if lead_form.is_valid():
+                lead_form.save()
+                messages.success(
+                    request,
+                    "Thank you — your group enquiry has been received. "
+                    "Our team will get back to you within one business day.",
+                )
+                return redirect("hotelbooking:contact-us")
+            context = {"form": ContactForm(), "lead_form": lead_form}
+            return render(request, self.template_name, context)
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                "Thank you for your message. Our team will get back to you soon.",
+            )
+            return redirect("hotelbooking:home")
+        context = {"form": form, "lead_form": LeadForm()}
+        return render(request, self.template_name, context)
 
     
 
