@@ -105,6 +105,13 @@ if EMAIL_HOST:
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+# Stripe Checkout (test mode). Payments stay disabled until the secret key
+# is set; the publishable key is only needed for Stripe.js, which Checkout
+# does not use, but it is kept for completeness.
+STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+
 
 TEMPLATES = [
     {

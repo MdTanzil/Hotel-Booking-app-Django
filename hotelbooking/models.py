@@ -85,6 +85,12 @@ class Booking(BaseModel):
         (STATUS_CONFIRMED, "Confirmed"),
         (STATUS_CANCELLED, "Cancelled"),
     ]
+    PAYMENT_UNPAID = "unpaid"
+    PAYMENT_PAID = "paid"
+    PAYMENT_CHOICES = [
+        (PAYMENT_UNPAID, "Unpaid"),
+        (PAYMENT_PAID, "Paid"),
+    ]
 
     start_date = models.DateField()
     end_date = models.DateField()
@@ -101,6 +107,9 @@ class Booking(BaseModel):
     reference = models.CharField(max_length=12, unique=True, null=True, blank=True)
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default=STATUS_CONFIRMED
+    )
+    payment_status = models.CharField(
+        max_length=10, choices=PAYMENT_CHOICES, default=PAYMENT_UNPAID
     )
 
     def save(self, *args, **kwargs):
@@ -123,6 +132,12 @@ class Package_Booking(BaseModel):
         (STATUS_CONFIRMED, "Confirmed"),
         (STATUS_CANCELLED, "Cancelled"),
     ]
+    PAYMENT_UNPAID = "unpaid"
+    PAYMENT_PAID = "paid"
+    PAYMENT_CHOICES = [
+        (PAYMENT_UNPAID, "Unpaid"),
+        (PAYMENT_PAID, "Paid"),
+    ]
 
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -137,6 +152,9 @@ class Package_Booking(BaseModel):
     reference = models.CharField(max_length=12, unique=True, null=True, blank=True)
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default=STATUS_CONFIRMED
+    )
+    payment_status = models.CharField(
+        max_length=10, choices=PAYMENT_CHOICES, default=PAYMENT_UNPAID
     )
 
     def save(self, *args, **kwargs):

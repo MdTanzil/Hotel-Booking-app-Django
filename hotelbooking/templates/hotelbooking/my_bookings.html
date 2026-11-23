@@ -20,6 +20,7 @@
                         <th>Total</th>
                         <th>Guest</th>
                         <th>Status</th>
+                        <th>Payment</th>
                         <th>Booked on</th>
                         <th></th>
                     </tr>
@@ -35,11 +36,18 @@
                         <td>${{ booking.stay_total }}</td>
                         <td>{{ booking.guest_name }}</td>
                         <td>{{ booking.get_status_display }}</td>
+                        <td>{{ booking.get_payment_status_display }}</td>
                         <td>{{ booking.created_at|date:"d M Y" }}</td>
                         <td>
                             {% if booking.status == "confirmed" %}
                             <a href="{% url 'hotelbooking:change-booking-dates' booking.reference %}" class="btn btn-sm btn-outline-primary mb-1">Change dates</a>
                             <a href="{% url 'hotelbooking:cancel-room-booking' booking.reference %}" class="btn btn-sm btn-outline-danger mb-1">Cancel</a>
+                            {% if booking.payment_status == "unpaid" and stripe_configured %}
+                            <form action="{% url 'hotelbooking:pay-now' 'room' booking.reference %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success mb-1">Pay now</button>
+                            </form>
+                            {% endif %}
                             {% endif %}
                         </td>
                     </tr>
@@ -62,6 +70,7 @@
                         <th>Price</th>
                         <th>Guest</th>
                         <th>Status</th>
+                        <th>Payment</th>
                         <th>Booked on</th>
                         <th></th>
                     </tr>
@@ -74,10 +83,17 @@
                         <td>${{ booking.package.price }} per night</td>
                         <td>{{ booking.name }}</td>
                         <td>{{ booking.get_status_display }}</td>
+                        <td>{{ booking.get_payment_status_display }}</td>
                         <td>{{ booking.created_at|date:"d M Y" }}</td>
                         <td>
                             {% if booking.status == "confirmed" %}
                             <a href="{% url 'hotelbooking:cancel-package-booking' booking.reference %}" class="btn btn-sm btn-outline-danger mb-1">Cancel</a>
+                            {% if booking.payment_status == "unpaid" and stripe_configured %}
+                            <form action="{% url 'hotelbooking:pay-now' 'package' booking.reference %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success mb-1">Pay now</button>
+                            </form>
+                            {% endif %}
                             {% endif %}
                         </td>
                     </tr>
@@ -98,6 +114,9 @@
             <p class="mb-1">Room bookings can be cancelled free of charge until 2 days before your check-in date. After that, please contact us directly.</p>
             <p class="mb-1">You can change the dates of a confirmed booking from this page, as long as the room is available for the new dates.</p>
             <p class="mb-0">Package bookings can be cancelled free of charge at any time from this page.</p>
+            {% if not stripe_configured %}
+            <p class="mb-0 mt-2">Online payment is not set up yet — please pay at the hotel.</p>
+            {% endif %}
         </div>
     </div>
 {% endblock body %}

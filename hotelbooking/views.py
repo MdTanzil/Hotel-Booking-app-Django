@@ -1,4 +1,11 @@
+import logging
+
+import stripe
+from django.conf import settings
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, date, timedelta
 from django.contrib import messages
 from django.views import View
@@ -13,6 +20,14 @@ from .emails import (
     send_package_booking_cancellation,
     send_booking_dates_changed,
 )
+from .payments import (
+    stripe_configured,
+    create_checkout_session,
+    mark_booking_paid,
+    stripe_get,
+)
+
+logger = logging.getLogger(__name__)
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from sslcommerz_lib import SSLCOMMERZ
@@ -239,7 +254,97 @@ class MyBookingsView(LoginRequiredMixin, TemplateView):
         )
         context["room_bookings"] = room_bookings
         context["package_bookings"] = package_bookings
+        context["stripe_configured"] = stripe_configured()
         return context
+
+
+class PayNowView(LoginRequiredMixin, View):
+    def post(self, request, kind, reference):
+        if kind not in ("room", "package"):
+            raise Http404("Unknown booking type")
+        if not stripe_configured():
+            messages.error(request, "Online payment is not set up yet.")
+            return redirect("hotelbooking:my-bookings")
+        model = Booking if kind == "room" else Package_Booking
+        booking = get_object_or_404(model, reference=reference, user=request.user)
+        if booking.status != model.STATUS_CONFIRMED:
+            messages.error(request, "Only confirmed bookings can be paid.")
+            return redirect("hotelbooking:my-bookings")
+        if booking.payment_status == model.PAYMENT_PAID:
+            messages.info(
+                request, f"Booking {booking.reference} is already paid."
+            )
+            return redirect("hotelbooking:my-bookings")
+        try:
+            session = create_checkout_session(request, booking, kind)
+        except Exception:
+            logger.exception("Stripe Checkout failed for %s", booking.reference)
+            messages.error(
+                request, "Could not start the payment. Please try again."
+            )
+            return redirect("hotelbooking:my-bookings")
+        if not getattr(session, "url", None):
+            messages.error(
+                request, "Could not start the payment. Please try again."
+            )
+            return redirect("hotelbooking:my-bookings")
+        return redirect(session.url)
+
+
+class PaymentSuccessView(LoginRequiredMixin, View):
+    def get(self, request):
+        session_id = request.GET.get("session_id")
+        if session_id and stripe_configured():
+            try:
+                stripe.api_key = settings.STRIPE_SECRET_KEY
+                session = stripe.checkout.Session.retrieve(session_id)
+                if session.payment_status == "paid":
+                    booking = mark_booking_paid(session)
+                    if booking:
+                        messages.success(
+                            request,
+                            f"Payment received for booking "
+                            f"{booking.reference}. Thank you!",
+                        )
+                        return redirect("hotelbooking:my-bookings")
+            except Exception:
+                logger.exception("Payment success check failed")
+        messages.info(
+            request,
+            "Thanks for your payment. If it was completed, your booking "
+            "will show as paid shortly.",
+        )
+        return redirect("hotelbooking:my-bookings")
+
+
+class PaymentCancelView(LoginRequiredMixin, View):
+    def get(self, request):
+        messages.info(
+            request,
+            "Payment cancelled. Your booking is still confirmed — you can "
+            "pay any time from My Bookings.",
+        )
+        return redirect("hotelbooking:my-bookings")
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class StripeWebhookView(View):
+    def post(self, request):
+        if not settings.STRIPE_WEBHOOK_SECRET:
+            return HttpResponseBadRequest("webhook not configured")
+        payload = request.body
+        sig_header = request.META.get("HTTP_STRIPE_SIGNATURE", "")
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+            )
+        except (ValueError, stripe.error.SignatureVerificationError):
+            return HttpResponseBadRequest("invalid signature")
+        if event["type"] == "checkout.session.completed":
+            session = event["data"]["object"]
+            if stripe_get(session, "payment_status") == "paid":
+                mark_booking_paid(session)
+        return HttpResponse(status=200)
 
 
 class CancelRoomBookingView(LoginRequiredMixin, View):
