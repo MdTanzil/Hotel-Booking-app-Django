@@ -605,12 +605,28 @@ class HeroSlide(BaseModel):
     subheading = models.CharField(max_length=200, blank=True, default="")
     image = models.ImageField(
         upload_to="hero/",
+        blank=True,
         help_text=(
-            "Recommended size: 1920 x 1080 pixels (16:9) or larger. "
-            "Use a wide landscape photo — the slider stretches the image "
-            "across the full screen width, so portrait photos will be "
-            "heavily cropped, and text near the edges may be cut off. "
-            "JPG or PNG, ideally under 500 KB so the home page stays fast."
+            "Upload an image, OR paste a link in the field below — one of "
+            "the two is required. Recommended size: 1920 x 1080 pixels "
+            "(16:9) or larger. Use a wide landscape photo — the slider "
+            "stretches the image across the full screen width, so portrait "
+            "photos will be heavily cropped, and text near the edges may "
+            "be cut off. JPG or PNG, ideally under 500 KB so the home page "
+            "stays fast. Note: on hosts with a read-only filesystem "
+            "(e.g. the Vercel demo) uploads cannot be saved — use a link "
+            "there instead."
+        ),
+    )
+    image_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        verbose_name="Image link (CDN)",
+        help_text=(
+            "Direct link to an image hosted elsewhere, e.g. Cloudinary, "
+            "Imgur or any CDN — paste the URL that ends in .jpg or .png. "
+            "If both an upload and a link are given, the link is used."
         ),
     )
     order = models.PositiveIntegerField(
@@ -625,3 +641,22 @@ class HeroSlide(BaseModel):
 
     def __str__(self):
         return self.heading or f"Hero slide #{self.pk}"
+
+    @property
+    def image_src(self):
+        """The URL the slider uses: the CDN link wins, else the upload."""
+        if self.image_url:
+            return self.image_url
+        if self.image:
+            return self.image.url
+        return ""
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        super().clean()
+        if not self.image_url and not self.image:
+            raise ValidationError(
+                "Give the slide an image: either upload one or paste an "
+                "image link (CDN)."
+            )

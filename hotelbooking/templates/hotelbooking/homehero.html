@@ -2,7 +2,7 @@
     <section class="home-slider owl-carousel">
       {% if hero_slides %}
       {% for slide in hero_slides %}
-      <div class="slider-item" style="background-image:url({{ slide.image.url }});">
+      <div class="slider-item" style="background-image:url({{ slide.image_src }});">
       	<div class="overlay"></div>
         <div class="container">
           <div class="row no-gutters slider-text align-items-center justify-content-center">

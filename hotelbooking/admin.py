@@ -333,11 +333,20 @@ class HeroSlideAdmin(admin.ModelAdmin):
         (
             None,
             {
-                "fields": ("heading", "subheading", "image", "preview_large"),
+                "fields": (
+                    "heading",
+                    "subheading",
+                    "image",
+                    "image_url",
+                    "preview_large",
+                ),
                 "description": (
-                    "Images should be 1920 x 1080 pixels (16:9) or larger — "
-                    "wide landscape photos. The slider stretches each image "
-                    "across the full screen width."
+                    "Give each slide an image in one of two ways: upload a "
+                    "file, or paste a direct image link (CDN). If both are "
+                    "given, the link is used. Images should be 1920 x 1080 "
+                    "pixels (16:9) or larger — wide landscape photos. The "
+                    "slider stretches each image across the full screen "
+                    "width."
                 ),
             },
         ),
@@ -345,21 +354,21 @@ class HeroSlideAdmin(admin.ModelAdmin):
     )
 
     def preview(self, obj):
-        if not obj.image:
+        if not obj.image_src:
             return "—"
         return format_html(
             '<img src="{}" style="width:120px;height:auto;" alt="">',
-            obj.image.url,
+            obj.image_src,
         )
 
     preview.short_description = "Image"
 
     def preview_large(self, obj):
-        if not obj.image:
-            return "No image uploaded yet."
+        if not obj.image_src:
+            return "No image yet — upload one or paste an image link."
         return format_html(
             '<img src="{}" style="max-width:600px;width:100%;height:auto;" alt="">',
-            obj.image.url,
+            obj.image_src,
         )
 
     preview_large.short_description = "Preview"

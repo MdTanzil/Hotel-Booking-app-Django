@@ -74,7 +74,13 @@ Each slide has a heading, a subheading, an image, an order number
 and an active flag. Slides show in order, lowest first; untick
 Active to hide a slide without deleting it.
 
-**Image size:** upload wide landscape photos, **1920 × 1080 pixels
+Each slide gets its image in one of two ways — **upload a file** or
+**paste a direct image link** (CDN). If both are given, the link is
+used. The link option is the one to use on the Vercel demo: paste
+the URL of an image hosted on Cloudinary, Imgur or any CDN (the
+URL should end in `.jpg` or `.png`).
+
+**Image size:** use wide landscape photos, **1920 × 1080 pixels
 (16:9) or larger**. The slider stretches each image across the full
 screen width, so portrait photos are heavily cropped and text near
 the edges may be cut off. JPG or PNG, ideally under 500 KB so the
@@ -83,10 +89,11 @@ home page stays fast.
 If no slide has a usable image, the home page falls back to the two
 built-in theme slides, so the hero is never empty.
 
-> Note: on the Vercel demo, files uploaded in the admin live on the
-> host's ephemeral filesystem — they do not survive the next
-> deployment. The seeded slides and room photos are re-created from
-> the repository on every deploy, so the site always has images.
+> Note: on the Vercel demo, the server filesystem is read-only, so
+> files uploaded in the admin cannot be saved there at all — use an
+> image link instead. The seeded slides and room photos are
+> re-created from the repository on every deploy, so the site always
+> has images.
 
 ## Try the demo
 

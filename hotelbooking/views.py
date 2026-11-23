@@ -54,17 +54,19 @@ class HomeTemplate(TemplateView):
         context["adults"] = 2
         context["children"] = 0
         context["latest_posts"] = BlogPost.objects.filter(published=True)[:4]
-        # Hero slideshow: only slides whose image file actually exists.
-        # An uploaded file can disappear when the site is redeployed (the
-        # host's filesystem is ephemeral), and a slide with a missing file
-        # would show as a broken hero — so such slides are skipped and the
-        # template falls back to the built-in slides when none remain.
+        # Hero slideshow: only slides with a usable image. A slide with a
+        # CDN link is always usable; an uploaded file can disappear when
+        # the site is redeployed (the host's filesystem is ephemeral), and
+        # a slide with a missing file would show as a broken hero — so
+        # such slides are skipped and the template falls back to the
+        # built-in slides when none remain.
         context["hero_slides"] = [
             slide
             for slide in HeroSlide.objects.filter(active=True).order_by(
                 "order", "id"
             )
-            if slide.image and default_storage.exists(slide.image.name)
+            if slide.image_url
+            or (slide.image and default_storage.exists(slide.image.name))
         ]
         return context
 
