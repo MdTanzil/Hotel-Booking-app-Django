@@ -43,7 +43,7 @@ class Room(BaseModel):
     room_view = models.ManyToManyField(Room_view)
     room_bed = models.IntegerField(default=1)
     room_image = models.ImageField(
-        upload_to=None, height_field=None, width_field=None, max_length=None
+        upload_to="rooms/", height_field=None, width_field=None, max_length=None
     )
 
     def __str__(self):
@@ -63,7 +63,7 @@ class Package(BaseModel):
     price = models.IntegerField(default=100)
     package_item = models.ManyToManyField(Package_item)
     package_image = models.ImageField(
-        "package", upload_to=None, height_field=None, width_field=None, max_length=None
+        "package", upload_to="packages/", height_field=None, width_field=None, max_length=None
     )
 
     def __str__(self):

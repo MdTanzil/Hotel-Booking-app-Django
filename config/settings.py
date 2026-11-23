@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+import urllib.parse
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,12 +22,35 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-rz1==a=z8!4-5_s9v$5yg=01l^+m(+0ysyk(165lq2wrkmwk1l"
+# In production (Vercel) set DJANGO_SECRET_KEY as an environment variable.
+# The fallback below is for local development only.
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-rz1==a=z8!4-5_s9v$5yg=01l^+m(+0ysyk(165lq2wrkmwk1l",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = (
+    ["*"]
+    if DEBUG
+    else os.environ.get("ALLOWED_HOSTS", ".vercel.app,localhost,127.0.0.1").split(
+        ","
+    )
+)
+
+# Origins allowed to POST forms (login, booking, contact) over HTTPS.
+# Defaults to any Vercel subdomain so the demo works out of the box; narrow
+# it to the exact domain in production, e.g.
+# CSRF_TRUSTED_ORIGINS=https://hotel-booking-app-django.vercel.app
+CSRF_TRUSTED_ORIGINS = [
+    o
+    for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "https://*.vercel.app").split(
+        ","
+    )
+    if o
+]
 
 
 # Application definition
@@ -41,6 +65,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",  # required by django-allauth
     "hotelbooking",
     "django_dump_die",
     "crispy_forms",
@@ -89,12 +114,35 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if os.environ.get("DATABASE_URL"):
+    # Production (Vercel): PostgreSQL, e.g. a free Neon database.
+    # The URL may carry ?sslmode=require; pass it through to psycopg2.
+    _db_url = urllib.parse.urlparse(os.environ["DATABASE_URL"])
+    _db_query = urllib.parse.parse_qs(_db_url.query)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": _db_url.path.lstrip("/"),
+            "USER": urllib.parse.unquote(_db_url.username or ""),
+            "PASSWORD": urllib.parse.unquote(_db_url.password or ""),
+            "HOST": _db_url.hostname,
+            "PORT": _db_url.port or "",
+            "OPTIONS": {"sslmode": _db_query.get("sslmode", ["prefer"])[0]},
+            # Reuse connections on warm serverless instances instead of
+            # opening a new one per request (slow against hosted Postgres).
+            # Health checks drop connections the database has closed.
+            "CONN_MAX_AGE": 600,
+            "CONN_HEALTH_CHECKS": True,
+        }
     }
-}
+else:
+    # Local development falls back to SQLite.
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
@@ -114,7 +162,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -138,11 +186,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = "static/"
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -153,8 +196,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # Django ALl Auth settings
 
 SITE_ID = 1
-ACCOUNT_EMAIL_REQUIRED = True
-LOGIN_URL = "/login/"
+LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
@@ -173,9 +215,6 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-
-
-LOGIN_URL = "/accounts/login/"
 
 JAZZMIN_SETTINGS = {
     "site_title": "Hotel Booking",
@@ -198,3 +237,11 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',  # 'danger' can be used for Bootstrap styling
 }
+
+# Behind Vercel's proxy, Django must trust X-Forwarded-Proto to know the
+# request arrived over HTTPS (affects CSRF, sessions and absolute URLs).
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

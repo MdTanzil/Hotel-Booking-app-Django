@@ -89,6 +89,12 @@ coverage.xml
 
 # pyenv 
 .python-version 
+# ...except the one Vercel reads to pick the Python version
+!.python-version
+
+# Vercel build output
+staticfiles/
+.vercel
 
 # celery 
 celerybeat-schedule.* 
