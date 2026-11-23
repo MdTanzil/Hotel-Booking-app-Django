@@ -16,6 +16,16 @@
             <div class ="col-md-8 ">
             <h3 class="mb-1">{{ package.name }}</h3>
             <p><span class="price mr-2">${{ package.price }}</span> <span class="per">per night</span></p>
+            {% if package.description %}
+            <p>{{ package.description }}</p>
+            {% endif %}
+            {% if package.validity_label %}
+            <p><strong>{{ package.validity_label }}</strong></p>
+            {% endif %}
+            {% if package.package_item.all %}
+            <p><strong>What's included:</strong>
+            {% for item in package.package_item.all %}{{ item }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            {% endif %}
             <form action="" method="post" >
                 {% csrf_token %}
                 {{ form|crispy}}

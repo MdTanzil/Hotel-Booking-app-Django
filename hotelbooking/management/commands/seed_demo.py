@@ -13,6 +13,7 @@ at all — even when the database already has the rooms, their photos
 must be copied again or the live pages show broken images.
 """
 
+from datetime import date
 from pathlib import Path
 
 from django.conf import settings
@@ -184,7 +185,8 @@ PACKAGE_ITEMS = [
     "Guided City Tour",
 ]
 
-# name, room name, price (BDT), items, image
+# name, room name, price (BDT), items, image, description,
+# valid from, valid to, terms (one per line)
 PACKAGES = [
     (
         "Weekend Getaway",
@@ -192,6 +194,13 @@ PACKAGES = [
         32000,
         ["Complimentary Breakfast", "Swimming Pool", "Guided City Tour"],
         "image_1.jpg",
+        "A relaxing weekend for the whole family: breakfast each morning, "
+        "pool access and a guided tour of the city on Saturday.",
+        date(2026, 11, 23),
+        date(2027, 3, 31),
+        "Valid for stays of up to 3 nights\n"
+        "Cannot be combined with other offers\n"
+        "Free cancellation at any time",
     ),
     (
         "Honeymoon Special",
@@ -199,6 +208,13 @@ PACKAGES = [
         45000,
         ["Complimentary Breakfast", "Spa Access", "Airport Pickup"],
         "image_2.jpg",
+        "A romantic escape in our finest suite: breakfast in bed, a spa "
+        "session for two and airport pickup on arrival.",
+        date(2026, 11, 23),
+        date(2027, 5, 31),
+        "Valid for stays of up to 5 nights\n"
+        "Spa session must be booked at least 24 hours ahead\n"
+        "Free cancellation at any time",
     ),
 ]
 
@@ -356,11 +372,28 @@ class Command(BaseCommand):
             name: Package_item.objects.get_or_create(item_name=name)[0]
             for name in PACKAGE_ITEMS
         }
-        for name, room_name, price, item_names, image in PACKAGES:
+        for (
+            name,
+            room_name,
+            price,
+            item_names,
+            image,
+            description,
+            valid_from,
+            valid_to,
+            terms,
+        ) in PACKAGES:
             package, _created = Package.objects.get_or_create(
                 name=name,
                 defaults={"room": rooms[room_name], "price": price},
             )
+            # Set on every run so packages seeded before these fields
+            # existed still get them.
+            package.description = description
+            package.valid_from = valid_from
+            package.valid_to = valid_to
+            package.terms = terms
+            package.save()
             package.package_item.set(items[i] for i in item_names)
             self._ensure_image(package.package_image, image)
             self.stdout.write(f"Package: {name}")

@@ -46,7 +46,9 @@ class RoomAdmin(admin.ModelAdmin):
 
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):
-    list_display = ("name", "room", "price")
+    list_display = ("name", "room", "price", "valid_from", "valid_to")
+    list_filter = ("valid_from", "valid_to")
+    filter_horizontal = ("package_item",)
 
 
 @admin.register(Booking)

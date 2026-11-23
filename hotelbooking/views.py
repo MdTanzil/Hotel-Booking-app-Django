@@ -122,7 +122,14 @@ class RoomsTemplate(View):
 class PackageTemplate(ListView):
     template_name = "hotelbooking/package.html"
     context_object_name = "packages"
-    queryset = Package.objects.all().filter(active=True)
+
+    def get_queryset(self):
+        today = date.today()
+        return (
+            Package.objects.filter(active=True)
+            .filter(Q(valid_from__isnull=True) | Q(valid_from__lte=today))
+            .filter(Q(valid_to__isnull=True) | Q(valid_to__gte=today))
+        )
 
 
 class RoomDetails(LoginRequiredMixin, TemplateView):
@@ -264,6 +271,11 @@ class CreateBookingRoom(LoginRequiredMixin, View):
 class PackageBookingCreateView(LoginRequiredMixin, View):
     def get(self, request, pk):
         package = Package.objects.get(id=pk)
+        if not package.is_current:
+            messages.error(
+                request, "This package is no longer available."
+            )
+            return redirect("hotelbooking:packages")
         form = PackageBookingForm()
         template_name = "hotelbooking/create_package_booking.html"
         context = {"form": form, "id": pk, "package": package}
@@ -271,6 +283,11 @@ class PackageBookingCreateView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         package = Package.objects.get(id=pk)
+        if not package.is_current:
+            messages.error(
+                request, "This package is no longer available."
+            )
+            return redirect("hotelbooking:packages")
         form = PackageBookingForm(
             request.POST, instance=Package_Booking(package=package)
         )

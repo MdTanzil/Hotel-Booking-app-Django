@@ -3,6 +3,7 @@ import random
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 from ckeditor.fields import RichTextField
 
 
@@ -122,12 +123,42 @@ class Package(BaseModel):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     price = models.IntegerField(default=100)
     package_item = models.ManyToManyField(Package_item)
+    description = models.TextField(blank=True)
+    valid_from = models.DateField(null=True, blank=True)
+    valid_to = models.DateField(null=True, blank=True)
+    terms = models.TextField(blank=True, help_text="One term per line.")
     package_image = models.ImageField(
         "package", upload_to="packages/", height_field=None, width_field=None, max_length=None
     )
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_current(self):
+        today = timezone.localdate()
+        if self.valid_from and today < self.valid_from:
+            return False
+        if self.valid_to and today > self.valid_to:
+            return False
+        return True
+
+    @property
+    def validity_label(self):
+        if self.valid_from and self.valid_to:
+            return (
+                f"Valid {self.valid_from.strftime('%d %b %Y')} – "
+                f"{self.valid_to.strftime('%d %b %Y')}"
+            )
+        if self.valid_from:
+            return f"Valid from {self.valid_from.strftime('%d %b %Y')}"
+        if self.valid_to:
+            return f"Valid until {self.valid_to.strftime('%d %b %Y')}"
+        return ""
+
+    @property
+    def terms_list(self):
+        return [line.strip() for line in self.terms.splitlines() if line.strip()]
 
 
 class Booking(BaseModel):
