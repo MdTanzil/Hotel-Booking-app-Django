@@ -11,7 +11,7 @@ from datetime import datetime, date, timedelta
 from django.contrib import messages
 from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
-from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost, TableBooking
+from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost, TableBooking, Event
 from .pricing import member_discount_for, discounted_price, stay_total
 from django.db.models import Q, Avg
 from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm, LeadForm, TableBookingForm
@@ -705,6 +705,29 @@ class BlogDetailView(DetailView):
 
     def get_queryset(self):
         return BlogPost.objects.filter(published=True)
+
+
+class EventListView(ListView):
+    model = Event
+    template_name = "hotelbooking/events/main.html"
+    context_object_name = "events"
+
+    def get_queryset(self):
+        # Upcoming events only: still running today or starting later.
+        today = date.today()
+        return Event.objects.filter(
+            Q(end_date__gte=today) | Q(end_date__isnull=True, start_date__gte=today),
+            published=True,
+        ).order_by("start_date")
+
+
+class EventDetailView(DetailView):
+    model = Event
+    template_name = "hotelbooking/events/detail.html"
+    context_object_name = "event"
+
+    def get_queryset(self):
+        return Event.objects.filter(published=True)
 
 class ContactFormView(View):
     template_name = "hotelbooking/contact/main.html"

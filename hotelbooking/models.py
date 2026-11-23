@@ -435,6 +435,79 @@ class BlogPost(BaseModel):
         return reverse("hotelbooking:blog-detail", args=[self.slug])
 
 
+class Event(BaseModel):
+    """A hotel event shown on the events calendar (dining nights, live
+    music, family weekends). Dates are on-property happenings — the hotel
+    has no stated location, so events never name a town or venue outside
+    the hotel grounds."""
+
+    CATEGORY_DINING = "dining"
+    CATEGORY_MUSIC = "music"
+    CATEGORY_FAMILY = "family"
+    CATEGORY_SEASONAL = "seasonal"
+    CATEGORY_CHOICES = [
+        (CATEGORY_DINING, "Dining"),
+        (CATEGORY_MUSIC, "Live music"),
+        (CATEGORY_FAMILY, "Family"),
+        (CATEGORY_SEASONAL, "Seasonal"),
+    ]
+
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True)
+    category = models.CharField(
+        max_length=10, choices=CATEGORY_CHOICES, default=CATEGORY_SEASONAL
+    )
+    start_date = models.DateField()
+    end_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Leave blank for a one-day event.",
+    )
+    time_text = models.CharField(
+        max_length=100,
+        default="",
+        blank=True,
+        help_text='e.g. "7:00 PM – 10:00 PM".',
+    )
+    location_text = models.CharField(
+        max_length=100,
+        default="",
+        blank=True,
+        help_text='Where in the hotel, e.g. "The Garden".',
+    )
+    excerpt = models.CharField(max_length=300)
+    body = models.TextField(help_text="Plain text; blank lines separate paragraphs.")
+    # Path of a theme image under static/images/, e.g. "images/image_1.jpg".
+    image = models.CharField(max_length=200, default="images/bg_1.jpg")
+    published = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["start_date"]
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+
+        return reverse("hotelbooking:event-detail", args=[self.slug])
+
+    @property
+    def date_label(self):
+        """'Dec 12, 2026' for one day, 'Dec 12 – 14, 2026' for a range."""
+        if self.end_date and self.end_date != self.start_date:
+            if self.end_date.month == self.start_date.month:
+                return (
+                    f"{self.start_date.strftime('%b %d')} – "
+                    f"{self.end_date.strftime('%d, %Y')}"
+                )
+            return (
+                f"{self.start_date.strftime('%b %d')} – "
+                f"{self.end_date.strftime('%b %d, %Y')}"
+            )
+        return self.start_date.strftime("%b %d, %Y")
+
+
 class TableBooking(BaseModel):
     """A restaurant table reservation from the Book a Table form."""
 

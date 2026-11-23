@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+Events
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="Events" %}
+    <section class="ftco-section bg-light">
+        <div class="container">
+            <div class="row justify-content-center mb-5 pb-3">
+                <div class="col-md-7 heading-section text-center ftco-animate">
+                    <h2>Upcoming events</h2>
+                    <p>Dining nights, live music and family weekends at the hotel. All events are open to guests — ask at the front desk or book a table if you'd like to join.</p>
+                </div>
+            </div>
+            {% regroup events by start_date|date:"F Y" as month_list %}
+            {% for month in month_list %}
+            <h3 class="mb-4">{{ month.grouper }}</h3>
+            <div class="row d-flex mb-5">
+                {% for event in month.list %}
+                <div class="col-md-4 d-flex ftco-animate">
+                    <div class="blog-entry align-self-stretch">
+                        <a href="{{ event.get_absolute_url }}"
+                           class="block-20"
+                           style="background-image: url('{% static event.image %}')"></a>
+                        <div class="text mt-3 d-block">
+                            <h3 class="heading mt-3">
+                                <a href="{{ event.get_absolute_url }}">{{ event.title }}</a>
+                            </h3>
+                            <div class="meta mb-3">
+                                <div>
+                                    <a href="{{ event.get_absolute_url }}">{{ event.date_label }}{% if event.time_text %} &middot; {{ event.time_text }}{% endif %}</a>
+                                </div>
+                                <div>
+                                    <a href="{{ event.get_absolute_url }}">{{ event.get_category_display }}{% if event.location_text %} &middot; {{ event.location_text }}{% endif %}</a>
+                                </div>
+                            </div>
+                            <p>{{ event.excerpt }}</p>
+                            <p><a href="{{ event.get_absolute_url }}" class="btn-custom">Read more <span class="icon-long-arrow-right"></span></a></p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% empty %}
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>No upcoming events right now — check back soon.</p>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p><a href="{% url 'hotelbooking:blog' %}">Read our blog</a> for guides and news from the hotel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock body %}

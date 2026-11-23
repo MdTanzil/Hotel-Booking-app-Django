@@ -13,7 +13,8 @@ at all — even when the database already has the rooms, their photos
 must be copied again or the live pages show broken images.
 """
 
-from datetime import date
+from datetime import date, timedelta
+
 from pathlib import Path
 
 from django.conf import settings
@@ -23,6 +24,7 @@ from django.core.management.base import BaseCommand
 
 from hotelbooking.models import (
     BlogPost,
+    Event,
     Package,
     Package_item,
     Review,
@@ -329,6 +331,61 @@ DEMO_USERS = [
 ]
 
 
+# (slug, title, category, days_from_today, duration_days, time, location,
+#  excerpt, body, image). Dates are relative to seeding day so the demo
+# events are always upcoming when the demo data is seeded.
+EVENTS = [
+    (
+        "garden-dinner-under-the-stars",
+        "Garden dinner under the stars",
+        "dining",
+        12,
+        1,
+        "7:00 PM – 10:00 PM",
+        "The Garden",
+        "A four-course dinner served at long tables in the garden, with the restaurant's seasonal menu and candles after dark.",
+        "Once a month the restaurant moves outside. The kitchen serves a four-course seasonal menu at long tables in the garden, and the evening ends with dessert under the stars.\n\nTables seat eight and are shared between guests, so it is a good night to meet the people staying next door. Book a table at the front desk or through the restaurant page — the garden seats fill up first.",
+        "images/menu-1.jpg",
+    ),
+    (
+        "live-music-friday",
+        "Live music Friday",
+        "music",
+        19,
+        1,
+        "8:00 PM – 11:00 PM",
+        "The Lounge",
+        "An evening of acoustic music in the lounge — no tickets, just turn up and order a drink.",
+        "Every few weeks a local acoustic act plays in the lounge. There are no tickets and no reserved seats: come down after dinner, order a drink, and stay as long as you like.\n\nThe lounge keeps serving until 11:00 PM on music nights. If you prefer a quieter evening, the garden rooms face away from the lounge and stay peaceful.",
+        "images/image_1.jpg",
+    ),
+    (
+        "family-fun-weekend",
+        "Family fun weekend",
+        "family",
+        26,
+        2,
+        "10:00 AM – 4:00 PM",
+        "Poolside and kids' area",
+        "Two days of games, pool activities and a kids' cooking session — free for families staying at the hotel.",
+        "A weekend built around the kids' area and the pool: games on the lawn in the morning, pool activities after lunch, and a short cooking session for children on the second day.\n\nEverything is free for families staying at the hotel. Children stay with their parents throughout, and the front desk has the full schedule when you arrive.",
+        "images/image_1.jpg",
+    ),
+    (
+        "winter-tea-afternoon",
+        "Winter tea afternoon",
+        "seasonal",
+        33,
+        1,
+        "3:00 PM – 5:00 PM",
+        "The Restaurant",
+        "Afternoon tea with seasonal bakes, served in the restaurant as the days get shorter.",
+        "As the days get shorter we bring back the winter tea: a pot of tea or coffee, seasonal bakes from the kitchen, and a quiet table in the restaurant.\n\nNo booking needed — just come down between 3:00 PM and 5:00 PM. Guests can charge it to the room.",
+        "images/menu-2.jpg",
+    ),
+]
+
+
 class Command(BaseCommand):
     help = (
         "Seed demo room categories, views, rooms, packages and demo "
@@ -454,6 +511,36 @@ class Command(BaseCommand):
                 },
             )
             self.stdout.write(f"Blog post: {title}")
+
+        for (
+            slug,
+            title,
+            category,
+            days_out,
+            duration,
+            time_text,
+            location,
+            excerpt,
+            body,
+            image,
+        ) in EVENTS:
+            start = date.today() + timedelta(days=days_out)
+            end = start + timedelta(days=duration - 1) if duration > 1 else None
+            Event.objects.get_or_create(
+                slug=slug,
+                defaults={
+                    "title": title,
+                    "category": category,
+                    "start_date": start,
+                    "end_date": end,
+                    "time_text": time_text,
+                    "location_text": location,
+                    "excerpt": excerpt,
+                    "body": body,
+                    "image": image,
+                },
+            )
+            self.stdout.write(f"Event: {title}")
 
         self._seed_demo_users()
 

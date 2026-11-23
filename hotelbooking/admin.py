@@ -20,6 +20,7 @@ from .models import (
     Review,
     BlogPost,
     TableBooking,
+    Event,
 )
 
 
@@ -276,6 +277,14 @@ class ReviewAdmin(admin.ModelAdmin):
 @admin.register(BlogPost)
 class BlogPostAdmin(admin.ModelAdmin):
     list_display = ("title", "category", "published", "created_at")
+    list_filter = ("category", "published")
+    search_fields = ["title", "excerpt"]
+    prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ("title", "start_date", "end_date", "category", "published")
     list_filter = ("category", "published")
     search_fields = ["title", "excerpt"]
     prepopulated_fields = {"slug": ("title",)}

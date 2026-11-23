@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+{{ event.title }}
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="Events" %}
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <h2 class="mb-3">{{ event.title }}</h2>
+                    <p class="text-muted mb-4">{{ event.date_label }}{% if event.time_text %} &middot; {{ event.time_text }}{% endif %}{% if event.location_text %} &middot; {{ event.location_text }}{% endif %} &middot; {{ event.get_category_display }}</p>
+                    <p><img src="{% static event.image %}" alt="{{ event.title }}" class="img-fluid"></p>
+                    {{ event.body|linebreaks }}
+                    <p class="mt-4">All events are open to guests. Ask at the front desk for details, or <a href="{% url 'hotelbooking:restaurants_home' %}#book-a-table">book a table</a> if you'd like to join us for dinner.</p>
+                    <p class="mt-5"><a href="{% url 'hotelbooking:events' %}" class="btn btn-primary">&larr; Back to all events</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock body %}
