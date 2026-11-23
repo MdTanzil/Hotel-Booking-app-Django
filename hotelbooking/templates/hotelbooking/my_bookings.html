@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    My Bookings
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="My Bookings" %}
+    <div class="container py-5">
+        <h2 class="mb-4">Room Bookings</h2>
+        {% if room_bookings %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Room</th>
+                        <th>Check in</th>
+                        <th>Check out</th>
+                        <th>Nights</th>
+                        <th>Total</th>
+                        <th>Guest</th>
+                        <th>Booked on</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in room_bookings %}
+                    <tr>
+                        <td><strong>{{ booking.reference }}</strong></td>
+                        <td>{{ booking.room.room_name }}</td>
+                        <td>{{ booking.start_date }}</td>
+                        <td>{{ booking.end_date }}</td>
+                        <td>{{ booking.nights }}</td>
+                        <td>${{ booking.stay_total }}</td>
+                        <td>{{ booking.guest_name }}</td>
+                        <td>{{ booking.created_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>You have no room bookings yet.</p>
+        {% endif %}
+
+        <h2 class="mt-5 mb-4">Package Bookings</h2>
+        {% if package_bookings %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Package</th>
+                        <th>Price</th>
+                        <th>Guest</th>
+                        <th>Booked on</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in package_bookings %}
+                    <tr>
+                        <td><strong>{{ booking.reference }}</strong></td>
+                        <td>{{ booking.package.name }}</td>
+                        <td>${{ booking.package.price }} per night</td>
+                        <td>{{ booking.name }}</td>
+                        <td>{{ booking.created_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>You have no package bookings yet.</p>
+        {% endif %}
+
+        {% if not room_bookings and not package_bookings %}
+        <p class="mt-4"><a href="{% url 'hotelbooking:rooms' %}" class="btn btn-primary">Browse Rooms</a></p>
+        {% endif %}
+    </div>
+{% endblock body %}

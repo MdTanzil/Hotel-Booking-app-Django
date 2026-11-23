@@ -1,5 +1,13 @@
+import random
+
+from django.conf import settings
 from django.db import models
 from ckeditor.fields import RichTextField
+
+
+def _generate_booking_reference():
+    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    return "HB-" + "".join(random.choices(alphabet, k=6))
 
 
 class BaseModel(models.Model):
@@ -76,6 +84,23 @@ class Booking(BaseModel):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     guest_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="room_bookings",
+    )
+    reference = models.CharField(max_length=12, unique=True, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            for _ in range(10):
+                candidate = _generate_booking_reference()
+                if not Booking.objects.filter(reference=candidate).exists():
+                    self.reference = candidate
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.room.room_name
@@ -85,6 +110,23 @@ class Package_Booking(BaseModel):
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=50)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="package_bookings",
+    )
+    reference = models.CharField(max_length=12, unique=True, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            for _ in range(10):
+                candidate = _generate_booking_reference()
+                if not Package_Booking.objects.filter(reference=candidate).exists():
+                    self.reference = candidate
+                    break
+        super().save(*args, **kwargs)
 
 
 class Guest(BaseModel):

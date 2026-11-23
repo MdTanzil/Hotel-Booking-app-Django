@@ -152,7 +152,9 @@ class CreateBookingRoom(LoginRequiredMixin, View):
         room = Room.objects.get(id=pk)
         form = BookingForm(request.POST, instance=Booking(room=room))
         if form.is_valid():
-            form.save()
+            booking = form.save(commit=False)
+            booking.user = request.user
+            booking.save()
             nights = (
                 form.cleaned_data["end_date"] - form.cleaned_data["start_date"]
             ).days
@@ -163,6 +165,7 @@ class CreateBookingRoom(LoginRequiredMixin, View):
                 f"{form.cleaned_data['start_date']} to "
                 f"{form.cleaned_data['end_date']} ({nights} night"
                 f"{'s' if nights != 1 else ''}, total ${total}). "
+                f"Your booking reference is {booking.reference}. "
                 "Our team will call you for confirmation.",
             )
             return redirect("hotelbooking:rooms")
@@ -185,16 +188,42 @@ class PackageBookingCreateView(LoginRequiredMixin, View):
             request.POST, instance=Package_Booking(package=package)
         )
         if form.is_valid():
-            form.save()
+            package_booking = form.save(commit=False)
+            package_booking.user = request.user
+            package_booking.save()
             messages.success(
                 request,
                 f"Your booking for the {package.name} package is confirmed. "
+                f"Your booking reference is {package_booking.reference}. "
                 "Our team will call you for confirmation.",
             )
             return redirect("hotelbooking:packages")
         template_name = "hotelbooking/create_package_booking.html"
         context = {"form": form, "id": pk, "package": package}
         return render(request, template_name, context)
+
+
+class MyBookingsView(LoginRequiredMixin, TemplateView):
+    template_name = "hotelbooking/my_bookings.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        room_bookings = (
+            Booking.objects.filter(user=self.request.user)
+            .select_related("room")
+            .order_by("-created_at")
+        )
+        for booking in room_bookings:
+            booking.nights = (booking.end_date - booking.start_date).days
+            booking.stay_total = booking.room.room_price * booking.nights
+        package_bookings = (
+            Package_Booking.objects.filter(user=self.request.user)
+            .select_related("package")
+            .order_by("-created_at")
+        )
+        context["room_bookings"] = room_bookings
+        context["package_bookings"] = package_bookings
+        return context
 
 
 class RestaurantsTemplateView(TemplateView):
