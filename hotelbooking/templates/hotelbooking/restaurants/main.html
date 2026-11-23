@@ -1,17 +1,95 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% block title %}
-Restaurants
+Restaurant
 {% endblock title %}
 {% block body %}
-    {% include 'hotelbooking/hero.html' with pagename="Restaurants" %}
-    <section class="ftco-section bg-light">
+    {% include 'hotelbooking/hero.html' with pagename="Restaurant" %}
+    <section class="ftco-section">
         <div class="container">
+            <div class="row justify-content-center mb-5 pb-3">
+                <div class="col-md-7 heading-section text-center ftco-animate">
+                    <h2>Our Restaurant</h2>
+                    <p>A relaxed dining room with a menu that changes with the season. Guests can charge meals to the room and settle everything together at check-out.</p>
+                </div>
+            </div>
             <div class="row">
-                <div>
-                <h1>Restaurants Coming Soon</h1>
+                <div class="col-md-6">
+                    <h3 class="mb-4">Opening times</h3>
+                    <table class="table">
+                        <tr><td>Breakfast</td><td>7:00 AM – 10:30 AM</td></tr>
+                        <tr><td>Lunch</td><td>12:00 PM – 3:00 PM</td></tr>
+                        <tr><td>Dinner</td><td>6:00 PM – 10:30 PM</td></tr>
+                    </table>
+                    <p>On Friday and Saturday evenings the dining room fills up — we recommend booking a table when you check in, or with the form below.</p>
+                </div>
+                <div class="col-md-6">
+                    <img src="{% static 'images/menu-1.jpg' %}" alt="Our restaurant" class="img-fluid">
                 </div>
             </div>
         </div>
-</section>
+    </section>
+    <section class="ftco-section bg-light">
+        <div class="container">
+            <div class="row justify-content-center mb-5 pb-3">
+                <div class="col-md-7 heading-section text-center ftco-animate">
+                    <h2>Sample Menu</h2>
+                    <p>The menu changes with the season — this is a taste of what we serve.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Starters</h4>
+                    <table class="table">
+                        <tr><td>Garden Salad</td><td class="text-right">$8</td></tr>
+                        <tr><td>Soup of the Day</td><td class="text-right">$7</td></tr>
+                        <tr><td>Grilled Prawns</td><td class="text-right">$12</td></tr>
+                    </table>
+                    <h4 class="mt-4">Mains</h4>
+                    <table class="table">
+                        <tr><td>Grilled Chicken with Herbs</td><td class="text-right">$18</td></tr>
+                        <tr><td>Pan-Fried Fish</td><td class="text-right">$22</td></tr>
+                        <tr><td>Vegetable Pasta</td><td class="text-right">$15</td></tr>
+                        <tr><td>Beef Steak</td><td class="text-right">$26</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h4>Desserts</h4>
+                    <table class="table">
+                        <tr><td>Chocolate Cake</td><td class="text-right">$8</td></tr>
+                        <tr><td>Fresh Fruit Platter</td><td class="text-right">$7</td></tr>
+                        <tr><td>Ice Cream (3 scoops)</td><td class="text-right">$6</td></tr>
+                    </table>
+                    <h4 class="mt-4">Drinks</h4>
+                    <table class="table">
+                        <tr><td>Fresh Juice</td><td class="text-right">$5</td></tr>
+                        <tr><td>Coffee or Tea</td><td class="text-right">$4</td></tr>
+                        <tr><td>Soft Drinks</td><td class="text-right">$3</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="ftco-section" id="book-a-table">
+        <div class="container">
+            <div class="row justify-content-center mb-5 pb-3">
+                <div class="col-md-7 heading-section text-center ftco-animate">
+                    <h2>Book a Table</h2>
+                    <p>Reserve a table for lunch or dinner. We will confirm your booking by email.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="pb-4 mb-6 mt-3 mb-4 text-center">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-0 p-6">Book a Table</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock body %}

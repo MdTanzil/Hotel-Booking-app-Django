@@ -1,4 +1,5 @@
 import random
+from datetime import time
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -419,3 +420,48 @@ class BlogPost(BaseModel):
         from django.urls import reverse
 
         return reverse("hotelbooking:blog-detail", args=[self.slug])
+
+
+class TableBooking(BaseModel):
+    """A restaurant table reservation from the Book a Table form."""
+
+    STATUS_PENDING = "pending"
+    STATUS_CONFIRMED = "confirmed"
+    STATUS_CANCELLED = "cancelled"
+    STATUS_CHOICES = [
+        (STATUS_PENDING, "Pending"),
+        (STATUS_CONFIRMED, "Confirmed"),
+        (STATUS_CANCELLED, "Cancelled"),
+    ]
+    TIME_CHOICES = [
+        (time(12, 0), "12:00 PM"),
+        (time(12, 30), "12:30 PM"),
+        (time(13, 0), "1:00 PM"),
+        (time(13, 30), "1:30 PM"),
+        (time(14, 0), "2:00 PM"),
+        (time(18, 0), "6:00 PM"),
+        (time(18, 30), "6:30 PM"),
+        (time(19, 0), "7:00 PM"),
+        (time(19, 30), "7:30 PM"),
+        (time(20, 0), "8:00 PM"),
+        (time(20, 30), "8:30 PM"),
+        (time(21, 0), "9:00 PM"),
+    ]
+
+    name = models.CharField(max_length=100, default="")
+    email = models.EmailField(default="")
+    phone_number = models.CharField(max_length=20, blank=True, default="")
+    date = models.DateField()
+    time = models.TimeField(choices=TIME_CHOICES)
+    guests = models.IntegerField(default=2)
+    occasion = models.CharField(max_length=100, blank=True, default="")
+    message = models.TextField(blank=True, default="")
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDING
+    )
+
+    class Meta:
+        ordering = ["date", "time"]
+
+    def __str__(self):
+        return f"{self.name} — {self.date} {self.time} ({self.guests} guests)"

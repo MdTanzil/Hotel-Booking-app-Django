@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-Restaurants
+About Us
 {% endblock title %}
 {% block body %}
     {% include 'hotelbooking/hero.html' with pagename="About Us" %}
@@ -38,7 +38,7 @@ Restaurants
                   
                       <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                         <div class="card-body ">
-                            Our Low Price Guarantee isn't just a promise; it's a commitment to providing you with unbeatable value and peace of mind when you shop with us. Trust us to deliver quality products and services without breaking the bank.
+                            Our Low Price Guarantee isn't just a promise; it's a commitment to providing you with unbeatable value and peace of mind when you book direct with us. Trust us to deliver quality rooms and services without breaking the bank.
                         </div>
                       </div>
                     </div>
@@ -107,6 +107,7 @@ Restaurants
                  
                   
                   </div>
+                  <p class="mt-4">See <a href="{% url 'hotelbooking:whats-included' %}">everything included with your stay</a>, or <a href="{% url 'hotelbooking:restaurants_home' %}">book a table in our restaurant</a>.</p>
             </div>
           </div>
         </div>

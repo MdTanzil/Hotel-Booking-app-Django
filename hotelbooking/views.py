@@ -11,9 +11,9 @@ from datetime import datetime, date, timedelta
 from django.contrib import messages
 from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
-from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost
+from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost, TableBooking
 from django.db.models import Q, Avg
-from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm, LeadForm
+from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm, LeadForm, TableBookingForm
 from .emails import (
     send_booking_confirmation,
     send_package_booking_confirmation,
@@ -637,9 +637,31 @@ class ChangeBookingDatesView(LoginRequiredMixin, View):
         return render(request, template_name, context)
 
 
-class RestaurantsTemplateView(TemplateView):
+class RestaurantsTemplateView(View):
     template_name = "hotelbooking/restaurants/main.html"
-    
+
+    def get(self, request):
+        context = {"form": TableBookingForm()}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        form = TableBookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save()
+            messages.success(
+                request,
+                f"Your table for {booking.guests} on "
+                f"{booking.date.strftime('%B %d, %Y')} at "
+                f"{booking.time.strftime('%I:%M %p')} is requested. "
+                "Our team will confirm it by email shortly.",
+            )
+            return redirect("hotelbooking:restaurants_home")
+        context = {"form": form}
+        return render(request, self.template_name, context)
+
+
+class WhatsIncludedView(TemplateView):
+    template_name = "hotelbooking/whats_included.html"
 
 class AboutUsTemplateView(TemplateView):
     template_name = "hotelbooking/about/main.html"

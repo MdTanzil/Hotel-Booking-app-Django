@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+What's Included
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="What's Included" %}
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center mb-5 pb-3">
+                <div class="col-md-7 heading-section text-center ftco-animate">
+                    <h2>Everything included with your stay</h2>
+                    <p>Every booking at Deluxe Hotels &amp; Resorts includes the following — no surprises at check-out.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>In your room</h4>
+                    <ul>
+                        <li>Free high-speed Wi-Fi throughout the hotel</li>
+                        <li>Daily housekeeping</li>
+                        <li>Complimentary bottled water</li>
+                        <li>Air conditioning, flat-screen TV and mini fridge</li>
+                        <li>Coffee maker, in-room safe and hair dryer</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4>Around the hotel</h4>
+                    <ul>
+                        <li>Outdoor swimming pool and kids' area</li>
+                        <li>Garden access — many rooms have a garden-facing balcony</li>
+                        <li>Restaurant serving breakfast, lunch and dinner</li>
+                        <li>24/7 front desk and room service</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h4>When you book direct</h4>
+                    <ul>
+                        <li>Free cancellation until 2 days before check-in</li>
+                        <li>Pay at the hotel or online — your choice</li>
+                        <li>No account needed to book</li>
+                        <li>Your booking reference and confirmation by email</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4>Good to know</h4>
+                    <ul>
+                        <li>Check-in from 2:00 PM, check-out by 12:00 PM</li>
+                        <li>Extra services such as spa treatments and transfers can be arranged at the front desk</li>
+                        <li>See the <a href="{% url 'hotelbooking:policies-faq' %}">Policies &amp; FAQ page</a> for cancellation, payment and house rules</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-md-12 text-center">
+                    <a href="{% url 'hotelbooking:rooms' %}" class="btn btn-primary btn-lg rounded-0">Browse rooms</a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock body %}

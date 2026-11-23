@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django import forms
-from .models import Booking, Package_Booking, Contact, Review, Lead
+from .models import Booking, Package_Booking, Contact, Review, Lead, TableBooking
 from datetime import datetime
 
 # Create the form class.
@@ -183,3 +183,42 @@ class LeadForm(ModelForm):
         if start_date and end_date and end_date <= start_date:
             self.add_error("end_date", "Departure date must be after arrival date.")
         return cleaned_data
+
+
+class TableBookingForm(ModelForm):
+    date = forms.DateField(
+        required=True,
+        label="Date",
+        widget=forms.DateInput(attrs={"type": "date", "min": datetime.now().date()}),
+    )
+    occasion = forms.CharField(
+        label="Occasion (optional)",
+        required=False,
+        help_text="Birthday, anniversary, business dinner — anything we should know.",
+    )
+    message = forms.CharField(
+        label="Anything else? (optional)",
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+
+    class Meta:
+        model = TableBooking
+        fields = [
+            "name",
+            "email",
+            "phone_number",
+            "date",
+            "time",
+            "guests",
+            "occasion",
+            "message",
+        ]
+
+    def clean_guests(self):
+        guests = self.cleaned_data.get("guests")
+        if guests is not None and not 1 <= guests <= 12:
+            raise forms.ValidationError(
+                "Tables seat 1 to 12 guests — for larger parties, please use the group enquiry form on the Contact page."
+            )
+        return guests

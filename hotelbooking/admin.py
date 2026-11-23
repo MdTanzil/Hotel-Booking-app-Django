@@ -13,6 +13,7 @@ from .models import (
     Contact,
     Review,
     BlogPost,
+    TableBooking,
 )
 
 
@@ -79,6 +80,13 @@ class BlogPostAdmin(admin.ModelAdmin):
     list_filter = ("category", "published")
     search_fields = ["title", "excerpt"]
     prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(TableBooking)
+class TableBookingAdmin(admin.ModelAdmin):
+    list_display = ("name", "date", "time", "guests", "status", "created_at")
+    list_filter = ("status", "date")
+    search_fields = ["name", "email", "occasion"]
 
 
 @admin.register(Guest)

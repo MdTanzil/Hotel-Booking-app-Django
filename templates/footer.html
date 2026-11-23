@@ -7,17 +7,6 @@
           <p>
             Comfortable rooms, a garden-facing pool and warm hospitality. Book direct for the best rate, free cancellation and pay at the hotel.
           </p>
-          <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
-            <li class="ftco-animate">
-              <a href="#"><span class="icon-twitter"></span></a>
-            </li>
-            <li class="ftco-animate">
-              <a href="#"><span class="icon-facebook"></span></a>
-            </li>
-            <li class="ftco-animate">
-              <a href="#"><span class="icon-instagram"></span></a>
-            </li>
-          </ul>
         </div>
       </div>
       <div class="col-md">
@@ -28,13 +17,10 @@
               <a href="{% url 'hotelbooking:blog' %}" class="py-2 d-block">Blog</a>
             </li>
             <li>
-              <a href="#" class="py-2 d-block">Rooms</a>
+              <a href="{% url 'hotelbooking:rooms' %}" class="py-2 d-block">Rooms</a>
             </li>
             <li>
-              <a href="#" class="py-2 d-block">Amenities</a>
-            </li>
-            <li>
-              <a href="#" class="py-2 d-block">Gift Card</a>
+              <a href="{% url 'hotelbooking:whats-included' %}" class="py-2 d-block">What's Included</a>
             </li>
             <li>
               <a href="{% url 'hotelbooking:policies-faq' %}" class="py-2 d-block">Policies &amp; FAQ</a>
@@ -47,16 +33,10 @@
           <h2 class="ftco-heading-2">Privacy</h2>
           <ul class="list-unstyled">
             <li>
-              <a href="#" class="py-2 d-block">Career</a>
+              <a href="{% url 'hotelbooking:about-us' %}" class="py-2 d-block">About Us</a>
             </li>
             <li>
-              <a href="#" class="py-2 d-block">About Us</a>
-            </li>
-            <li>
-              <a href="#" class="py-2 d-block">Contact Us</a>
-            </li>
-            <li>
-              <a href="#" class="py-2 d-block">Services</a>
+              <a href="{% url 'hotelbooking:contact-us' %}" class="py-2 d-block">Contact Us</a>
             </li>
           </ul>
         </div>
