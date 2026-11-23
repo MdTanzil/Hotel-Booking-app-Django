@@ -234,6 +234,28 @@ class MyBookingsView(LoginRequiredMixin, TemplateView):
 
 
 class CancelRoomBookingView(LoginRequiredMixin, View):
+    def get(self, request, reference):
+        booking = get_object_or_404(
+            Booking, reference=reference, user=request.user
+        )
+        if booking.status == Booking.STATUS_CANCELLED:
+            messages.info(
+                request, f"Booking {booking.reference} is already cancelled."
+            )
+            return redirect("hotelbooking:my-bookings")
+        if booking.start_date - date.today() < timedelta(days=2):
+            messages.error(
+                request,
+                "This booking can no longer be cancelled online. Free "
+                "cancellation ends 2 days before check-in — please contact us.",
+            )
+            return redirect("hotelbooking:my-bookings")
+        booking.nights = (booking.end_date - booking.start_date).days
+        booking.stay_total = booking.room.room_price * booking.nights
+        template_name = "hotelbooking/confirm_cancel.html"
+        context = {"booking": booking, "kind": "room"}
+        return render(request, template_name, context)
+
     def post(self, request, reference):
         booking = get_object_or_404(
             Booking, reference=reference, user=request.user
@@ -258,6 +280,19 @@ class CancelRoomBookingView(LoginRequiredMixin, View):
 
 
 class CancelPackageBookingView(LoginRequiredMixin, View):
+    def get(self, request, reference):
+        booking = get_object_or_404(
+            Package_Booking, reference=reference, user=request.user
+        )
+        if booking.status == Package_Booking.STATUS_CANCELLED:
+            messages.info(
+                request, f"Booking {booking.reference} is already cancelled."
+            )
+            return redirect("hotelbooking:my-bookings")
+        template_name = "hotelbooking/confirm_cancel.html"
+        context = {"booking": booking, "kind": "package"}
+        return render(request, template_name, context)
+
     def post(self, request, reference):
         booking = get_object_or_404(
             Package_Booking, reference=reference, user=request.user

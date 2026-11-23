@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Cancel Booking
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="Cancel Booking" %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <h2 class="mb-4">Cancel booking {{ booking.reference }}?</h2>
+                {% if kind == "room" %}
+                <p><strong>{{ booking.room.room_name }}</strong><br>
+                {{ booking.start_date }} to {{ booking.end_date }} ({{ booking.nights }} nights, total ${{ booking.stay_total }})<br>
+                Guest: {{ booking.guest_name }}</p>
+                {% else %}
+                <p><strong>{{ booking.package.name }}</strong> package<br>
+                Guest: {{ booking.name }}</p>
+                {% endif %}
+                <p>This cannot be undone.</p>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger rounded-0 p-6">Yes, cancel this booking</button>
+                    <a href="{% url 'hotelbooking:my-bookings' %}" class="btn btn-secondary rounded-0 p-6 ml-2">Keep my booking</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock body %}

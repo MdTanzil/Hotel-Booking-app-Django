@@ -39,10 +39,7 @@
                         <td>
                             {% if booking.status == "confirmed" %}
                             <a href="{% url 'hotelbooking:change-booking-dates' booking.reference %}" class="btn btn-sm btn-outline-primary mb-1">Change dates</a>
-                            <form action="{% url 'hotelbooking:cancel-room-booking' booking.reference %}" method="post" class="d-inline" onsubmit="return confirm('Cancel booking {{ booking.reference }}?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger mb-1">Cancel</button>
-                            </form>
+                            <a href="{% url 'hotelbooking:cancel-room-booking' booking.reference %}" class="btn btn-sm btn-outline-danger mb-1">Cancel</a>
                             {% endif %}
                         </td>
                     </tr>
@@ -80,10 +77,7 @@
                         <td>{{ booking.created_at|date:"d M Y" }}</td>
                         <td>
                             {% if booking.status == "confirmed" %}
-                            <form action="{% url 'hotelbooking:cancel-package-booking' booking.reference %}" method="post" class="d-inline" onsubmit="return confirm('Cancel booking {{ booking.reference }}?');">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger mb-1">Cancel</button>
-                            </form>
+                            <a href="{% url 'hotelbooking:cancel-package-booking' booking.reference %}" class="btn btn-sm btn-outline-danger mb-1">Cancel</a>
                             {% endif %}
                         </td>
                     </tr>
