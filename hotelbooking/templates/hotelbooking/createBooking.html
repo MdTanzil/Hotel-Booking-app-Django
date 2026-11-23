@@ -20,8 +20,16 @@
             <div class="col-md-12">
                 <div class="p-3 mb-4 text-center" style="background: #f8f9fa; border: 1px solid #e9ecef;">
                     <h4 class="mb-1">{{ room.room_name }}</h4>
-                    <p class="mb-1"><span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span></p>
-                    <p class="mb-0" id="stay-total" data-price="{{ room.room_price }}">Pick your dates to see the total for your stay.</p>
+                    <p class="mb-1">
+                        {% if member_rate_applied %}
+                        <span class="price mr-2"><s>${{ room.room_price }}</s> ${{ nightly_rate }}</span> <span class="per">per night</span>
+                        <br><small class="text-success">Member rate applied — 10% off</small>
+                        {% else %}
+                        <span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>
+                        <br><small><a href="{% url 'account_login' %}">Sign in</a> to save 10% on this stay.</small>
+                        {% endif %}
+                    </p>
+                    <p class="mb-0" id="stay-total" data-price="{{ nightly_rate }}">Pick your dates to see the total for your stay.</p>
                     <p class="mb-0 mt-2"><small>Free cancellation until 2 days before check-in.</small></p>
                 </div>
             </div>

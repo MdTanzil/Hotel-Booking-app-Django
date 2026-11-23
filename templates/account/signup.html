@@ -32,6 +32,8 @@
     
     
     <p>Already have an account? Then please <a href="{% url 'account_login' %}" class=" text-primary ">sign in</a> </p>
+
+    <p class="text-muted">Signing up is free. Members get 10% off every room stay, late check-out until 1 PM, and a free room upgrade when one is available.</p>
     
     {% if not SOCIALACCOUNT_ONLY %}
         {% url 'account_signup' as action_url %}

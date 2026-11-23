@@ -1,5 +1,6 @@
 import random
 from datetime import time
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -207,6 +208,11 @@ class Booking(BaseModel):
     payment_status = models.CharField(
         max_length=10, choices=PAYMENT_CHOICES, default=PAYMENT_UNPAID
     )
+    # Member-rate discount locked in when the booking was made (0.10 for
+    # signed-in members, 0 for guests). See hotelbooking/pricing.py.
+    discount_rate = models.DecimalField(
+        max_digits=3, decimal_places=2, default=Decimal("0")
+    )
 
     @property
     def contact_email(self):
@@ -215,6 +221,13 @@ class Booking(BaseModel):
         if self.user:
             return self.user.email
         return ""
+
+    def stay_total_amount(self):
+        """Total for this stay at the rate locked in at booking time."""
+        from .pricing import stay_total
+
+        nights = (self.end_date - self.start_date).days
+        return stay_total(self.room.room_price, nights, self.discount_rate)
 
     def save(self, *args, **kwargs):
         if not self.reference:

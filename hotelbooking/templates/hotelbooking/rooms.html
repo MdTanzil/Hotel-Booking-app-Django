@@ -32,7 +32,7 @@
                                             <a href="{% url 'hotelbooking:details-room' room.id %} ">{{ room.room_name }}</a>
                                         </h3>
                                         <p>
-                                            <span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>
+                                            {% if user.is_authenticated %}<span class="price mr-2"><s>${{ room.room_price }}</s> ${{ room.display_price }}</span> <span class="per">per night</span>{% else %}<span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>{% endif %}
                                         </p>
                                         <ul class="list">
                                             <li>
@@ -98,7 +98,7 @@
                                         <a href="{% url 'hotelbooking:details-room' room.id %} ">{{ room.room_name }}</a>
                                     </h3>
                                     <p>
-                                        <span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>
+                                        {% if user.is_authenticated %}<span class="price mr-2"><s>${{ room.room_price }}</s> ${{ room.display_price }}</span> <span class="per">per night</span>{% else %}<span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>{% endif %}
                                     </p>
                                     <ul class="list">
                                         <li>

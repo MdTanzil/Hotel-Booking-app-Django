@@ -32,10 +32,19 @@
                                                 <a href="{% url 'hotelbooking:details-room' room.id %} ">{{ room.room_name }}</a>
                                             </h3>
                                             <p>
+                                                {% if user.is_authenticated %}
+                                                <span class="price mr-2"><s>${{ room.room_price }}</s> ${{ room.display_price }}</span> <span class="per">per night</span>
+                                                {% else %}
                                                 <span class="price mr-2">${{ room.room_price }}</span> <span class="per">per night</span>
+                                                {% endif %}
                                             </p>
                                             {% if nights %}
                                             <p class="mb-0"><strong>Total for {{ nights }} night{{ nights|pluralize }}: ${{ room.stay_total }}</strong></p>
+                                            {% if user.is_authenticated %}
+                                            <p class="mb-0 small text-success">Member rate applied — 10% off</p>
+                                            {% else %}
+                                            <p class="mb-0 small"><a href="{% url 'account_login' %}">Sign in</a> to save 10% on this stay.</p>
+                                            {% endif %}
                                             {% endif %}
                                             <ul class="list">
                                                 <li>

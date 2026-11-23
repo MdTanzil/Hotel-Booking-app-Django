@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
 from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost, TableBooking
+from .pricing import member_discount_for, discounted_price, stay_total
 from django.db.models import Q, Avg
 from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm, LeadForm, TableBookingForm
 from .emails import (
@@ -79,6 +80,9 @@ class RoomsTemplate(View):
             id_list.append(i.room.id)
         available_rooms = Room.objects.exclude(id__in=id_list).filter(active=True)
         all_rooms = Room.objects.all().filter(active=True)
+        discount = member_discount_for(request.user)
+        for room in list(available_rooms) + list(all_rooms):
+            room.display_price = discounted_price(room.room_price, discount)
         template_name = "hotelbooking/rooms.html"
         context = {
             "rooms": available_rooms,
@@ -146,7 +150,12 @@ class RoomsTemplate(View):
                 room_category_id=room_type_id
             )
         for room in available_rooms:
-            room.stay_total = room.room_price * nights
+            room.stay_total = stay_total(
+                room.room_price, nights, member_discount_for(request.user)
+            )
+            room.display_price = discounted_price(
+                room.room_price, member_discount_for(request.user)
+            )
         context = {
             "rooms": available_rooms,
             "start_date": start_date,
@@ -191,6 +200,9 @@ class RoomDetails(TemplateView):
             "average_rating": round(average, 1) if average else None,
             "review_form": ReviewForm(instance=user_review),
             "user_review": user_review,
+            "display_price": discounted_price(
+                room.room_price, member_discount_for(request.user)
+            ),
         }
         return render(request, template_name, context)
 
@@ -244,7 +256,15 @@ class CreateBookingRoom(View):
             initial=initial, stripe_available=stripe_configured()
         )
         template_name = "hotelbooking/createBooking.html"
-        context = {"form": form, "id": pk, "room": room}
+        context = {
+            "form": form,
+            "id": pk,
+            "room": room,
+            "nightly_rate": discounted_price(
+                room.room_price, member_discount_for(request.user)
+            ),
+            "member_rate_applied": request.user.is_authenticated,
+        }
         return render(request, template_name, context)
 
     def post(self, request, pk):
@@ -258,12 +278,13 @@ class CreateBookingRoom(View):
             booking = form.save(commit=False)
             if request.user.is_authenticated:
                 booking.user = request.user
+            booking.discount_rate = member_discount_for(request.user)
             booking.save()
             send_booking_confirmation(booking)
             nights = (
                 form.cleaned_data["end_date"] - form.cleaned_data["start_date"]
             ).days
-            total = room.room_price * nights
+            total = booking.stay_total_amount()
             if (
                 booking.payment_method == Booking.PAY_ONLINE
                 and stripe_configured()
@@ -291,7 +312,8 @@ class CreateBookingRoom(View):
                     f"Your booking for {room.room_name} is confirmed for "
                     f"{form.cleaned_data['start_date']} to "
                     f"{form.cleaned_data['end_date']} ({nights} night"
-                    f"{'s' if nights != 1 else ''}, total ${total}). "
+                    f"{'s' if nights != 1 else ''}, total ${total}"
+                    f"{' — member rate applied, 10% off' if booking.discount_rate else ''}). "
                     f"Your booking reference is {booking.reference}. "
                     "Our team will call you for confirmation.",
                 )
@@ -398,7 +420,7 @@ class MyBookingsView(LoginRequiredMixin, TemplateView):
         )
         for booking in room_bookings:
             booking.nights = (booking.end_date - booking.start_date).days
-            booking.stay_total = booking.room.room_price * booking.nights
+            booking.stay_total = booking.stay_total_amount()
         package_bookings = (
             Package_Booking.objects.filter(user=self.request.user)
             .select_related("package")
@@ -517,7 +539,7 @@ class CancelRoomBookingView(LoginRequiredMixin, View):
             )
             return redirect("hotelbooking:my-bookings")
         booking.nights = (booking.end_date - booking.start_date).days
-        booking.stay_total = booking.room.room_price * booking.nights
+        booking.stay_total = booking.stay_total_amount()
         template_name = "hotelbooking/confirm_cancel.html"
         context = {"booking": booking, "kind": "room"}
         return render(request, template_name, context)
@@ -624,7 +646,7 @@ class ChangeBookingDatesView(LoginRequiredMixin, View):
                 form.save()
                 send_booking_dates_changed(booking)
                 nights = (end_date - start_date).days
-                total = booking.room.room_price * nights
+                total = booking.stay_total_amount()
                 messages.success(
                     request,
                     f"Booking {booking.reference} moved to {start_date} - "
@@ -785,7 +807,7 @@ class GuestBookingDetailView(View):
             return redirect("hotelbooking:find-booking")
         if kind == "room":
             booking.nights = (booking.end_date - booking.start_date).days
-            booking.stay_total = booking.room.room_price * booking.nights
+            booking.stay_total = booking.stay_total_amount()
         context = {
             "booking": booking,
             "kind": kind,
@@ -828,7 +850,7 @@ class GuestCancelBookingView(View):
             )
         if kind == "room":
             booking.nights = (booking.end_date - booking.start_date).days
-            booking.stay_total = booking.room.room_price * booking.nights
+            booking.stay_total = booking.stay_total_amount()
         context = {
             "booking": booking,
             "kind": kind,

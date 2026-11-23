@@ -33,7 +33,7 @@
                         <td>{{ booking.start_date }}</td>
                         <td>{{ booking.end_date }}</td>
                         <td>{{ booking.nights }}</td>
-                        <td>${{ booking.stay_total }}</td>
+                        <td>${{ booking.stay_total }}{% if booking.discount_rate %}<br><small class="text-success">Member rate</small>{% endif %}</td>
                         <td>{{ booking.guest_name }}</td>
                         <td>{{ booking.get_status_display }}</td>
                         <td>{{ booking.get_payment_status_display }}</td>

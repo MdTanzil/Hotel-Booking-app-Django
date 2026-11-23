@@ -39,7 +39,7 @@ class BookingForm(ModelForm):
 
     class Meta:
         model = Booking
-        exclude = ["active", "room", "user", "reference", "status", "payment_status"]
+        exclude = ["active", "room", "user", "reference", "status", "payment_status", "discount_rate"]
 
     def clean(self):
         cleaned_data = super().clean()

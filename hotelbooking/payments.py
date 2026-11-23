@@ -28,8 +28,9 @@ def _amount_cents(amount):
 
 
 def booking_amount(booking):
-    nights = (booking.end_date - booking.start_date).days
-    return booking.room.room_price * nights
+    """Amount to charge for a room booking, at the rate locked in when
+    the booking was made (member rate if it was booked signed in)."""
+    return booking.stay_total_amount()
 
 
 def create_checkout_session(request, booking, kind):

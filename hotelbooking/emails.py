@@ -50,7 +50,7 @@ def send_booking_confirmation(booking):
         {
             "booking": booking,
             "nights": nights,
-            "total": booking.room.room_price * nights,
+            "total": booking.stay_total_amount(),
         },
     )
 
@@ -91,6 +91,6 @@ def send_booking_dates_changed(booking):
         {
             "booking": booking,
             "nights": nights,
-            "total": booking.room.room_price * nights,
+            "total": booking.stay_total_amount(),
         },
     )
