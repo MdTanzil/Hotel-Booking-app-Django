@@ -54,6 +54,24 @@ def main():
     run_migrate()
     run("collectstatic", "--noinput")
     run("seed_demo", "--if-empty")
+    _list_media_files()
+
+
+def _list_media_files():
+    """Print the media files present after seeding, so the build log
+    proves the room/package photos made it into this deployment.
+    """
+    from pathlib import Path
+
+    media_root = Path(__file__).resolve().parent / "media"
+    files = sorted(
+        str(p.relative_to(media_root))
+        for p in media_root.rglob("*")
+        if p.is_file()
+    )
+    print(f"media files ({len(files)}):", flush=True)
+    for f in files:
+        print(f"  media/{f}", flush=True)
 
 
 if __name__ == "__main__":

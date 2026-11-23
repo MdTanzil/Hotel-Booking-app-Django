@@ -5,12 +5,19 @@ static/images/ into MEDIA_ROOT. Run automatically by build.py on Vercel;
 safe to run locally too:
 
     python manage.py seed_demo --if-empty
+
+The command is idempotent: it never creates duplicate rows, and it
+re-copies any photo whose file is missing. That second part matters on
+Vercel: media/ is not in git, so every build starts with no photo files
+at all — even when the database already has the rooms, their photos
+must be copied again or the live pages show broken images.
 """
 
 from pathlib import Path
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
 
 from hotelbooking.models import (
@@ -141,21 +148,36 @@ PACKAGES = [
 ]
 
 
+DEMO_PASSWORD = "demo1234"
+
+# Demo accounts shown on the login page so visitors can try the site.
+# username, email, display name, is_staff, is_superuser
+DEMO_USERS = [
+    ("admin", "admin@demo.hotel", "Demo Admin", True, True),
+    ("staff", "staff@demo.hotel", "Demo Staff", True, False),
+    ("guest", "guest@demo.hotel", "Demo Guest", False, False),
+]
+
+
 class Command(BaseCommand):
-    help = "Seed demo room categories, views, rooms and packages."
+    help = (
+        "Seed demo room categories, views, rooms, packages and demo "
+        "accounts. Idempotent: never duplicates rows, and re-copies any "
+        "photo whose file is missing."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--if-empty",
             action="store_true",
-            help="Only seed when no rooms exist yet.",
+            help=(
+                "Accepted for compatibility; the command is idempotent, "
+                "so rows are never duplicated, and photos are always "
+                "ensured even when the rooms already exist."
+            ),
         )
 
     def handle(self, *args, **options):
-        if options["if_empty"] and Room.objects.exists():
-            self.stdout.write("Rooms already exist, skipping seed.")
-            return
-
         categories = {
             name: Room_category.objects.get_or_create(
                 name=name, defaults={"desc": desc}
@@ -171,7 +193,7 @@ class Command(BaseCommand):
 
         rooms = {}
         for name, price, persons, size, beds, cat, view_names, image, desc in ROOMS:
-            room, created = Room.objects.get_or_create(
+            room, _created = Room.objects.get_or_create(
                 room_name=name,
                 defaults={
                     "room_price": price,
@@ -183,8 +205,7 @@ class Command(BaseCommand):
                 },
             )
             room.room_view.set(views[v] for v in view_names)
-            if created or not room.room_image:
-                room.room_image.save(image, ContentFile(self._image_bytes(image)))
+            self._ensure_image(room.room_image, image)
             rooms[name] = room
             self.stdout.write(f"Room: {name}")
 
@@ -193,18 +214,76 @@ class Command(BaseCommand):
             for name in PACKAGE_ITEMS
         }
         for name, room_name, price, item_names, image in PACKAGES:
-            package, created = Package.objects.get_or_create(
+            package, _created = Package.objects.get_or_create(
                 name=name,
                 defaults={"room": rooms[room_name], "price": price},
             )
             package.package_item.set(items[i] for i in item_names)
-            if created or not package.package_image:
-                package.package_image.save(
-                    image, ContentFile(self._image_bytes(image))
-                )
+            self._ensure_image(package.package_image, image)
             self.stdout.write(f"Package: {name}")
 
+        self._seed_demo_users()
+
         self.stdout.write(self.style.SUCCESS("Demo data seeded."))
+
+    def _ensure_image(self, field_file, filename):
+        """Copy the seed photo into media unless its file is already there.
+
+        The database row may survive from an earlier deployment while the
+        file does not (media/ is not in git, so each Vercel build starts
+        with an empty media folder). Checking the file, not just the row,
+        is what keeps live photos working after every deploy.
+        """
+        if field_file and default_storage.exists(field_file.name):
+            return
+        field_file.save(filename, ContentFile(self._image_bytes(filename)))
+
+    def _seed_demo_users(self):
+        """Create the demo accounts shown on the login page.
+
+        Passwords are reset on every run so the published demo logins
+        keep working even if a visitor changes one. An account is only
+        ever touched when its email matches the demo address: if a real
+        visitor registered the same username first, it is left alone.
+        """
+        from django.contrib.auth import get_user_model
+        from django.contrib.auth.models import Permission
+
+        User = get_user_model()
+        for username, email, display_name, is_staff, is_superuser in DEMO_USERS:
+            existing = User.objects.filter(username=username).first()
+            if existing and existing.email != email:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"User '{username}' exists with a different email; "
+                        "leaving it alone."
+                    )
+                )
+                continue
+            user, _created = User.objects.update_or_create(
+                username=username,
+                defaults={
+                    "email": email,
+                    "first_name": display_name,
+                    "is_staff": is_staff,
+                    "is_superuser": is_superuser,
+                    "is_active": True,
+                },
+            )
+            user.set_password(DEMO_PASSWORD)
+            user.save()
+            if is_staff and not is_superuser:
+                # Staff can explore the admin and manage bookings, but
+                # cannot delete anything or manage users.
+                perms = Permission.objects.filter(
+                    content_type__app_label="hotelbooking",
+                    codename__regex=r"^(view|add|change)_",
+                )
+                user.user_permissions.set(perms)
+            role = (
+                "superuser" if is_superuser else "staff" if is_staff else "user"
+            )
+            self.stdout.write(f"Demo user: {username} ({role})")
 
     @staticmethod
     def _image_bytes(filename):
