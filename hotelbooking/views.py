@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from datetime import datetime, date, timedelta
+from django.contrib import messages
 from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView
 from .models import Room, Package, Booking, Room_category, Package_Booking
@@ -135,7 +136,17 @@ class CreateBookingRoom(LoginRequiredMixin, View):
         form = BookingForm(request.POST, instance=Booking(room=room))
         if form.is_valid():
             form.save()
-        return render(request, "hotelbooking/rooms.html")
+            messages.success(
+                request,
+                f"Your booking for {room.room_name} is confirmed for "
+                f"{form.cleaned_data['start_date']} to "
+                f"{form.cleaned_data['end_date']}. Our team will call you "
+                "for confirmation.",
+            )
+            return redirect("hotelbooking:rooms")
+        template_name = "hotelbooking/createBooking.html"
+        context = {"form": form, "id": pk}
+        return render(request, template_name, context)
 
 
 class PackageBookingCreateView(LoginRequiredMixin, View):
@@ -153,7 +164,15 @@ class PackageBookingCreateView(LoginRequiredMixin, View):
         )
         if form.is_valid():
             form.save()
-        return render(request, "hotelbooking/index.html")
+            messages.success(
+                request,
+                f"Your booking for the {package.name} package is confirmed. "
+                "Our team will call you for confirmation.",
+            )
+            return redirect("hotelbooking:packages")
+        template_name = "hotelbooking/create_package_booking.html"
+        context = {"form": form, "id": pk}
+        return render(request, template_name, context)
 
 
 class RestaurantsTemplateView(TemplateView):
