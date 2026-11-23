@@ -11,7 +11,8 @@ from datetime import datetime, date, timedelta
 from django.contrib import messages
 from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
-from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost, TableBooking, Event
+from django.core.files.storage import default_storage
+from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost, TableBooking, Event, HeroSlide
 from .pricing import member_discount_for, discounted_price, stay_total
 from django.db.models import Q, Avg
 from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm, LeadForm, TableBookingForm
@@ -53,6 +54,18 @@ class HomeTemplate(TemplateView):
         context["adults"] = 2
         context["children"] = 0
         context["latest_posts"] = BlogPost.objects.filter(published=True)[:4]
+        # Hero slideshow: only slides whose image file actually exists.
+        # An uploaded file can disappear when the site is redeployed (the
+        # host's filesystem is ephemeral), and a slide with a missing file
+        # would show as a broken hero — so such slides are skipped and the
+        # template falls back to the built-in slides when none remain.
+        context["hero_slides"] = [
+            slide
+            for slide in HeroSlide.objects.filter(active=True).order_by(
+                "order", "id"
+            )
+            if slide.image and default_storage.exists(slide.image.name)
+        ]
         return context
 
 

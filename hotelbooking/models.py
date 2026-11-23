@@ -590,3 +590,38 @@ class SiteSettings(BaseModel):
     def get_settings(cls):
         """The single settings row, or None if it does not exist yet."""
         return cls.objects.first()
+
+
+class HeroSlide(BaseModel):
+    """One slide of the home-page hero slideshow, managed in the admin.
+
+    Active slides show in ``order`` on the home page. If no slide has a
+    usable image (e.g. an uploaded file was lost when the site was
+    redeployed), the home page falls back to the built-in theme slides,
+    so the hero is never empty.
+    """
+
+    heading = models.CharField(max_length=200, default="")
+    subheading = models.CharField(max_length=200, blank=True, default="")
+    image = models.ImageField(
+        upload_to="hero/",
+        help_text=(
+            "Recommended size: 1920 x 1080 pixels (16:9) or larger. "
+            "Use a wide landscape photo — the slider stretches the image "
+            "across the full screen width, so portrait photos will be "
+            "heavily cropped, and text near the edges may be cut off. "
+            "JPG or PNG, ideally under 500 KB so the home page stays fast."
+        ),
+    )
+    order = models.PositiveIntegerField(
+        default=0, help_text="Slides show in this order, lowest first."
+    )
+    active = models.BooleanField(
+        default=True, help_text="Untick to hide this slide without deleting it."
+    )
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.heading or f"Hero slide #{self.pk}"

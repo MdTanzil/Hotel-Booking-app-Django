@@ -1,12 +1,30 @@
-   {% load static %} 
+   {% load static %}
     <section class="home-slider owl-carousel">
+      {% if hero_slides %}
+      {% for slide in hero_slides %}
+      <div class="slider-item" style="background-image:url({{ slide.image.url }});">
+      	<div class="overlay"></div>
+        <div class="container">
+          <div class="row no-gutters slider-text align-items-center justify-content-center">
+          <div class="col-md-12 ftco-animate text-center">
+          	<div class="text mb-5 pb-3">
+	            <h1 class="mb-3">{{ slide.heading }}</h1>
+	            {% if slide.subheading %}<h2>{{ slide.subheading }}</h2>{% endif %}
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      {# Fallback: no hero slides in the admin (or their images are missing) — use the built-in theme slides. #}
       <div class="slider-item" style="background-image:url({% static 'images/bg_1.jpg' %});">
       	<div class="overlay"></div>
         <div class="container">
           <div class="row no-gutters slider-text align-items-center justify-content-center">
           <div class="col-md-12 ftco-animate text-center">
           	<div class="text mb-5 pb-3">
-	            <h1 class="mb-3">Welcome To Deluxe</h1>
+	            <h1 class="mb-3">Welcome To {{ site_settings.hotel_name|default:"Deluxe" }}</h1>
 	            <h2>Hotels &amp; Resorts</h2>
             </div>
           </div>
@@ -27,4 +45,5 @@
         </div>
         </div>
       </div>
+      {% endif %}
     </section>

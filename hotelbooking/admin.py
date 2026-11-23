@@ -3,6 +3,7 @@ from datetime import date, timedelta
 
 from django.contrib import admin, messages
 from django.db.models import Q
+from django.utils.html import format_html
 from django.shortcuts import render
 from django.urls import path
 from .models import (
@@ -22,6 +23,7 @@ from .models import (
     TableBooking,
     Event,
     SiteSettings,
+    HeroSlide,
 )
 
 
@@ -317,6 +319,50 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         # Deleting the only row would silently revert the site to defaults.
         return False
+
+
+@admin.register(HeroSlide)
+class HeroSlideAdmin(admin.ModelAdmin):
+    """Home-page hero slideshow: upload images, order them, hide/show."""
+
+    list_display = ("preview", "heading", "order", "active", "updated_at")
+    list_editable = ("order", "active")
+    search_fields = ["heading", "subheading"]
+    readonly_fields = ("preview_large",)
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": ("heading", "subheading", "image", "preview_large"),
+                "description": (
+                    "Images should be 1920 x 1080 pixels (16:9) or larger — "
+                    "wide landscape photos. The slider stretches each image "
+                    "across the full screen width."
+                ),
+            },
+        ),
+        ("Order & visibility", {"fields": ("order", "active")}),
+    )
+
+    def preview(self, obj):
+        if not obj.image:
+            return "—"
+        return format_html(
+            '<img src="{}" style="width:120px;height:auto;" alt="">',
+            obj.image.url,
+        )
+
+    preview.short_description = "Image"
+
+    def preview_large(self, obj):
+        if not obj.image:
+            return "No image uploaded yet."
+        return format_html(
+            '<img src="{}" style="max-width:600px;width:100%;height:auto;" alt="">',
+            obj.image.url,
+        )
+
+    preview_large.short_description = "Preview"
 
 
 @admin.register(TableBooking)

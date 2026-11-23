@@ -25,6 +25,7 @@ from django.core.management.base import BaseCommand
 from hotelbooking.models import (
     BlogPost,
     Event,
+    HeroSlide,
     Package,
     Package_item,
     Review,
@@ -335,6 +336,12 @@ DEMO_USERS = [
 # (slug, title, category, days_from_today, duration_days, time, location,
 #  excerpt, body, image). Dates are relative to seeding day so the demo
 # events are always upcoming when the demo data is seeded.
+# Home-page hero slides: (heading, subheading, theme image file, order).
+HERO_SLIDES = [
+    ("Welcome To Deluxe", "Hotels & Resorts", "bg_1.jpg", 0),
+    ("Enjoy A Luxury Experience", "Join With Us", "bg_2.jpg", 1),
+]
+
 EVENTS = [
     (
         "garden-dinner-under-the-stars",
@@ -560,6 +567,21 @@ class Command(BaseCommand):
             }
         )
         self.stdout.write("Site information: Deluxe")
+
+        # Hero slideshow: the two theme slides, as admin-editable rows.
+        # The image is (re-)copied only while the slide still uses the
+        # seeded file — on every Vercel build media/ starts empty, so the
+        # file must be restored, but a slide whose image was replaced in
+        # the admin is left alone.
+        for heading, subheading, image_file, order in HERO_SLIDES:
+            slide, _created = HeroSlide.objects.get_or_create(
+                heading=heading,
+                defaults={"subheading": subheading, "order": order},
+            )
+            expected = f"hero/{image_file}"
+            if not slide.image or slide.image.name == expected:
+                self._ensure_image(slide.image, image_file)
+            self.stdout.write(f"Hero slide: {heading}")
 
         self._seed_demo_users()
 
