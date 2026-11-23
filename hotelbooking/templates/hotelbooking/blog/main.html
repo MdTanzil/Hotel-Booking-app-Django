@@ -1,24 +1,48 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-Restaurants
+Blog
 {% endblock title %}
 {% block body %}
     {% include 'hotelbooking/hero.html' with pagename="Blog" %}
     <section class="ftco-section bg-light">
-        <!-- About 6 - Bootstrap Brain Component -->
-  <section class="bsb-about-6 py-3 py-md-5 py-xl-8">
-    <div class="container">
-      <div class="row justify-content-md-center">
-        <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
-          <h2 class="mb-4 display-5 text-center">Blog</h2>
-          <p class="text-secondary mb-5 text-center lead fs-4">Coming soon..</p>
-          
+        <div class="container">
+            <div class="row justify-content-center mb-5 pb-3">
+                <div class="col-md-7 heading-section text-center ftco-animate">
+                    <h2>Stories from the hotel</h2>
+                    <p>Guides for your stay, news from the hotel and notes from our restaurant.</p>
+                </div>
+            </div>
+            <div class="row d-flex">
+                {% for post in posts %}
+                <div class="col-md-4 d-flex ftco-animate">
+                    <div class="blog-entry align-self-stretch">
+                        <a href="{{ post.get_absolute_url }}"
+                           class="block-20"
+                           style="background-image: url('{% static post.image %}')"></a>
+                        <div class="text mt-3 d-block">
+                            <h3 class="heading mt-3">
+                                <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                            </h3>
+                            <div class="meta mb-3">
+                                <div>
+                                    <a href="{{ post.get_absolute_url }}">{{ post.created_at|date:"M d, Y" }}</a>
+                                </div>
+                                <div>
+                                    <a href="{{ post.get_absolute_url }}">{{ post.get_category_display }}</a>
+                                </div>
+                            </div>
+                            <p>{{ post.excerpt }}</p>
+                            <p><a href="{{ post.get_absolute_url }}" class="btn-custom">Read more <span class="icon-long-arrow-right"></span></a></p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-md-12 text-center">
+                    <p>No posts yet — check back soon.</p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-      </div>
-    </div>
-  
-
-  </section>
-</section>
+    </section>
 {% endblock body %}

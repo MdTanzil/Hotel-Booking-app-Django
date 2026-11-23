@@ -356,3 +356,37 @@ class Contact(BaseModel):
     message = models.TextField()
     def __str__(self):
         return self.name
+
+class BlogPost(BaseModel):
+    CATEGORY_GUIDE = "guide"
+    CATEGORY_EVENT = "event"
+    CATEGORY_HOTEL = "hotel"
+    CATEGORY_DINING = "dining"
+    CATEGORY_CHOICES = [
+        (CATEGORY_GUIDE, "Guide"),
+        (CATEGORY_EVENT, "Event"),
+        (CATEGORY_HOTEL, "Hotel news"),
+        (CATEGORY_DINING, "Dining"),
+    ]
+
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True)
+    category = models.CharField(
+        max_length=10, choices=CATEGORY_CHOICES, default=CATEGORY_HOTEL
+    )
+    excerpt = models.CharField(max_length=300)
+    body = models.TextField(help_text="Plain text; blank lines separate paragraphs.")
+    # Path of a theme image under static/images/, e.g. "images/image_1.jpg".
+    image = models.CharField(max_length=200, default="images/bg_1.jpg")
+    published = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+
+        return reverse("hotelbooking:blog-detail", args=[self.slug])

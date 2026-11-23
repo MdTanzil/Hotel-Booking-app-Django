@@ -22,6 +22,7 @@ from django.core.files.storage import default_storage
 from django.core.management.base import BaseCommand
 
 from hotelbooking.models import (
+    BlogPost,
     Package,
     Package_item,
     Review,
@@ -283,6 +284,41 @@ REVIEWS = [
     ),
 ]
 
+BLOG_POSTS = [
+    (
+        "slow-morning-at-deluxe",
+        "A slow morning at Deluxe: garden breakfasts and the outdoor pool",
+        "hotel",
+        "There is no better way to start a day here than breakfast by the garden, then a slow hour at the outdoor pool.",
+        "Mornings at Deluxe move at their own pace. The garden-facing rooms catch the first light, and from the balcony you can hear the pool before you see it. Breakfast is served in the restaurant, and on a clear day the garden tables are the ones to ask for.\n\nAfter breakfast, the outdoor pool is at its quietest. Families tend to arrive later in the day, so the early hours belong to swimmers and readers. The kids' area opens with the pool, and the Family Suite is a two-minute walk away, which makes the morning routine easy when you are travelling with children.\n\nIf you are staying in a garden-view room, ask the front desk for a late check-out when you arrive. Check-out is at noon, but when the next guest arrives later in the day we are often able to stretch it — and a slow morning deserves a slow ending.",
+        "images/image_1.jpg",
+    ),
+    (
+        "planning-a-family-weekend",
+        "Planning a family weekend: which room to pick and what to pack",
+        "guide",
+        "Two adults, two children, one weekend. Here is how to choose the room and pack the bag so the trip runs itself.",
+        "The room is the decision that shapes the whole weekend. For a family of four, the Family Suite sleeps everyone comfortably with two queen beds, and the garden-facing balcony gives the adults somewhere to sit once the children are asleep. Every room has free Wi-Fi, air conditioning and a mini fridge — the fridge matters more than you think when you are travelling with small children.\n\nPack light, but pack for the pool: swimwear, sunscreen and a change of clothes for the journey home. The hotel provides towels at the pool, and daily housekeeping keeps the room reset while you are out. If you need anything during your stay, the front desk is the fastest way to get it.\n\nOne practical note: room bookings can be cancelled free of charge until two days before check-in, so if the children's plans change, yours can too. Book direct on this site and you can pay at the hotel — no card payment is needed in advance.",
+        "images/image_2.jpg",
+    ),
+    (
+        "winter-escape",
+        "Winter escape: why the cooler months are the best time to stay",
+        "guide",
+        "Cooler air, quieter gardens and the best packages of the year. The winter season runs through March — here is how to make the most of it.",
+        "The cooler months change the whole feel of the hotel. The gardens are at their greenest, the pool is warm in the afternoon sun, and the evenings are made for the balcony. It is also the season when our holiday packages run: the Weekend Getaway and the Honeymoon Special are both valid through the spring, and they bundle the room with the extras that make a short stay feel complete.\n\nA winter weekend works best with a loose plan. Arrive on Friday, settle in, and let Saturday shape itself around the pool and the restaurant. If you want a table for dinner, book it when you check in — weekends fill up.\n\nTravelling in the cooler months has one more advantage: the rooms with garden and pool views are easier to get. Book a little ahead, and you can pick the view you want rather than the one that is left.",
+        "images/image_3.jpg",
+    ),
+    (
+        "dinner-at-the-hotel",
+        "Dinner at the hotel: what to expect from our restaurant",
+        "dining",
+        "A relaxed dining room, a menu that changes with the season, and tables for families as well as couples.",
+        "Dinner at the hotel is deliberately unhurried. The dining room serves through the evening, the menu changes with the season, and there is always something straightforward for children alongside the main dishes. If you are staying with family, the early tables are the easiest — and the staff are used to high chairs and small appetites.\n\nCouples tend to come later, when the room quiets down. Ask for a garden-side table if you would like one; they are first come, first served.\n\nYou do not need to be a guest to eat with us, but guests get the simplest deal: charge dinner to the room and settle everything together at check-out. If you would like a table on a Friday or Saturday evening, it is worth asking at the front desk when you arrive.",
+        "images/menu-1.jpg",
+    ),
+]
+
 
 # Demo accounts shown on the login page so visitors can try the site.
 # username, email, display name, is_staff, is_superuser
@@ -405,6 +441,19 @@ class Command(BaseCommand):
                 defaults={"rating": rating, "text": text},
             )
             self.stdout.write(f"Review: {guest_name} on {room_name}")
+
+        for slug, title, category, excerpt, body, image in BLOG_POSTS:
+            BlogPost.objects.get_or_create(
+                slug=slug,
+                defaults={
+                    "title": title,
+                    "category": category,
+                    "excerpt": excerpt,
+                    "body": body,
+                    "image": image,
+                },
+            )
+            self.stdout.write(f"Blog post: {title}")
 
         self._seed_demo_users()
 

@@ -12,6 +12,7 @@ from .models import (
     Lead,
     Contact,
     Review,
+    BlogPost,
 )
 
 
@@ -70,6 +71,14 @@ class ReviewAdmin(admin.ModelAdmin):
     list_display = ("guest_name", "room", "rating", "created_at")
     list_filter = ("rating", "room")
     search_fields = ["guest_name", "text"]
+
+
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ("title", "category", "published", "created_at")
+    list_filter = ("category", "published")
+    search_fields = ["title", "excerpt"]
+    prepopulated_fields = {"slug": ("title",)}
 
 
 @admin.register(Guest)

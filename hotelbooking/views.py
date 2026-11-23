@@ -10,8 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, date, timedelta
 from django.contrib import messages
 from django.views import View
-from django.views.generic import TemplateView, ListView, CreateView
-from .models import Room, Package, Booking, Room_category, Package_Booking, Review
+from django.views.generic import TemplateView, ListView, CreateView, DetailView
+from .models import Room, Package, Booking, Room_category, Package_Booking, Review, BlogPost
 from django.db.models import Q, Avg
 from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm, ReviewForm, FindBookingForm
 from .emails import (
@@ -51,6 +51,7 @@ class HomeTemplate(TemplateView):
         context["room_categories"] = Room_category.objects.all()
         context["adults"] = 2
         context["children"] = 0
+        context["latest_posts"] = BlogPost.objects.filter(published=True)[:4]
         return context
 
 
@@ -644,9 +645,22 @@ class AboutUsTemplateView(TemplateView):
     template_name = "hotelbooking/about/main.html"
     
 
-class BlogTemplateView(TemplateView):
+class BlogTemplateView(ListView):
+    model = BlogPost
     template_name = "hotelbooking/blog/main.html"
-    
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        return BlogPost.objects.filter(published=True)
+
+
+class BlogDetailView(DetailView):
+    model = BlogPost
+    template_name = "hotelbooking/blog/detail.html"
+    context_object_name = "post"
+
+    def get_queryset(self):
+        return BlogPost.objects.filter(published=True)
 
 class ContactFormView(FormView):
     form_class = ContactForm

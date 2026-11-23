@@ -54,3 +54,16 @@
         </div>
     </form>
 </div>
+<script>
+(function () {
+    // Clicking a date field opens the calendar picker, and past dates
+    // cannot be picked.
+    var today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('.sidebar-wrap input[type="date"]').forEach(function (input) {
+        input.min = today;
+        input.addEventListener('click', function () {
+            try { if (input.showPicker) input.showPicker(); } catch (e) {}
+        });
+    });
+})();
+</script>
