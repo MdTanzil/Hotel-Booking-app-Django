@@ -1,0 +1,83 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .cal-nav { margin: 1em 0; font-size: 1.1em; }
+  .cal-nav a { margin: 0 1em; }
+  .cal-legend { margin: 1em 0; }
+  .cal-legend span { display: inline-block; margin-right: 1.5em; }
+  .cal-swatch { display: inline-block; width: 1em; height: 1em; vertical-align: middle; border: 1px solid #999; }
+  .cal-swatch.confirmed { background: #c8e6c9; }
+  .cal-swatch.cancelled { background: #e0e0e0; }
+  .cal-swatch.clash { background: #fff; outline: 2px solid #c62828; }
+  table.calendar { border-collapse: collapse; width: 100%; table-layout: fixed; }
+  table.calendar th, table.calendar td { border: 1px solid #ddd; padding: 4px; text-align: center; font-size: 12px; }
+  table.calendar th.room-col, table.calendar td.room-col { text-align: left; width: 180px; min-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  table.calendar td.booked-confirmed { background: #c8e6c9; }
+  table.calendar td.booked-cancelled { background: #e0e0e0; color: #777; }
+  table.calendar td.clash { outline: 2px solid #c62828; outline-offset: -2px; }
+  table.calendar td a { color: #1565c0; text-decoration: none; white-space: nowrap; }
+  .cal-paid { font-weight: bold; color: #2e7d32; }
+</style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:hotelbooking_booking_changelist' %}">Bookings</a>
+  &rsaquo; Reservation calendar
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>Reservation calendar — {{ month_name }} {{ year }}</h1>
+
+<div class="cal-nav">
+  <a href="?year={{ prev_year }}&amp;month={{ prev_month }}">&larr; Previous month</a>
+  <a href="?year={{ next_year }}&amp;month={{ next_month }}">Next month &rarr;</a>
+</div>
+
+<p class="cal-legend">
+  <span><span class="cal-swatch confirmed"></span> Confirmed</span>
+  <span><span class="cal-swatch cancelled"></span> Cancelled</span>
+  <span><span class="cal-swatch clash"></span> Double-booked day</span>
+  <span><span class="cal-paid">&#10003; Paid</span> = paid in full</span>
+</p>
+
+<div style="overflow-x: auto;">
+<table class="calendar">
+  <thead>
+    <tr>
+      <th class="room-col">Room</th>
+      {% for day in days %}
+      <th>{{ day }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td class="room-col"><strong>{{ row.room.room_name }}</strong></td>
+      {% for cell in row.cells %}
+      {% if cell %}
+      <td class="booked-{{ cell.booking.status }}{% if cell.clash %} clash{% endif %}" title="{{ cell.booking.guest_name }} — {{ cell.booking.reference }} ({{ cell.booking.start_date }} to {{ cell.booking.end_date }})">
+        {% if cell.is_start %}
+        <a href="{% url 'admin:hotelbooking_booking_change' cell.booking.pk %}">{{ cell.booking.guest_name }} ({{ cell.booking.reference }}){% if cell.booking.payment_status == 'paid' %} <span class="cal-paid">&#10003;</span>{% endif %}</a>
+        {% endif %}
+      </td>
+      {% else %}
+      <td></td>
+      {% endif %}
+      {% endfor %}
+    </tr>
+    {% empty %}
+    <tr><td colspan="32">No rooms yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<p style="margin-top: 1em;">Each booking covers its nights from check-in up to (but not including) check-out. Package bookings are not shown here — see the package bookings list.</p>
+{% endblock %}
