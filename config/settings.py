@@ -89,7 +89,21 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Email: use SMTP when EMAIL_HOST is set, otherwise print mail to the
+# console (development/demo default, so nothing breaks without SMTP).
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL", "Deluxe Hotel <noreply@deluxe-hotel.demo>"
+)
+if EMAIL_HOST:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 TEMPLATES = [

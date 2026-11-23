@@ -1,0 +1,17 @@
+Hello {{ booking.guest_name }},
+
+Your booking at Deluxe Hotel is confirmed.
+
+Booking reference: {{ booking.reference }}
+Room: {{ booking.room.room_name }}
+Check in: {{ booking.start_date }}
+Check out: {{ booking.end_date }}
+Nights: {{ nights }}
+Total: ${{ total }}
+
+You can view, change or cancel your booking from the My Bookings page.
+Free cancellation is available until 2 days before your check-in date.
+
+We look forward to welcoming you.
+
+Deluxe Hotel

@@ -1,0 +1,10 @@
+Hello {{ booking.name }},
+
+Your package booking at Deluxe Hotel has been cancelled.
+
+Booking reference: {{ booking.reference }}
+Package: {{ booking.package.name }}
+
+If this was a mistake, please book again or contact us.
+
+Deluxe Hotel

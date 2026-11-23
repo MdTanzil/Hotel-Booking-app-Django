@@ -6,6 +6,13 @@ from django.views.generic import TemplateView, ListView, CreateView
 from .models import Room, Package, Booking, Room_category, Package_Booking
 from django.db.models import Q
 from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm
+from .emails import (
+    send_booking_confirmation,
+    send_package_booking_confirmation,
+    send_booking_cancellation,
+    send_package_booking_cancellation,
+    send_booking_dates_changed,
+)
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from sslcommerz_lib import SSLCOMMERZ
@@ -162,6 +169,7 @@ class CreateBookingRoom(LoginRequiredMixin, View):
             booking = form.save(commit=False)
             booking.user = request.user
             booking.save()
+            send_booking_confirmation(booking)
             nights = (
                 form.cleaned_data["end_date"] - form.cleaned_data["start_date"]
             ).days
@@ -198,6 +206,7 @@ class PackageBookingCreateView(LoginRequiredMixin, View):
             package_booking = form.save(commit=False)
             package_booking.user = request.user
             package_booking.save()
+            send_package_booking_confirmation(package_booking)
             messages.success(
                 request,
                 f"Your booking for the {package.name} package is confirmed. "
@@ -273,6 +282,7 @@ class CancelRoomBookingView(LoginRequiredMixin, View):
         else:
             booking.status = Booking.STATUS_CANCELLED
             booking.save()
+            send_booking_cancellation(booking)
             messages.success(
                 request, f"Booking {booking.reference} has been cancelled."
             )
@@ -304,6 +314,7 @@ class CancelPackageBookingView(LoginRequiredMixin, View):
         else:
             booking.status = Package_Booking.STATUS_CANCELLED
             booking.save()
+            send_package_booking_cancellation(booking)
             messages.success(
                 request, f"Booking {booking.reference} has been cancelled."
             )
@@ -354,6 +365,7 @@ class ChangeBookingDatesView(LoginRequiredMixin, View):
                 form.add_error(None, "This room is not available for those dates.")
             else:
                 form.save()
+                send_booking_dates_changed(booking)
                 nights = (end_date - start_date).days
                 total = booking.room.room_price * nights
                 messages.success(

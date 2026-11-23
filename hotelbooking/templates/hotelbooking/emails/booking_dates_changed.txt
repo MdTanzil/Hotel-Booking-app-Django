@@ -1,0 +1,14 @@
+Hello {{ booking.guest_name }},
+
+The dates of your booking at Deluxe Hotel have changed.
+
+Booking reference: {{ booking.reference }}
+Room: {{ booking.room.room_name }}
+New check in: {{ booking.start_date }}
+New check out: {{ booking.end_date }}
+Nights: {{ nights }}
+New total: ${{ total }}
+
+You can view, change or cancel your booking from the My Bookings page.
+
+Deluxe Hotel

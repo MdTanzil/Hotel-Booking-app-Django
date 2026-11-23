@@ -1,0 +1,12 @@
+Hello {{ booking.guest_name }},
+
+Your booking at Deluxe Hotel has been cancelled.
+
+Booking reference: {{ booking.reference }}
+Room: {{ booking.room.room_name }}
+Check in: {{ booking.start_date }}
+Check out: {{ booking.end_date }}
+
+If this was a mistake, please book again or contact us.
+
+Deluxe Hotel

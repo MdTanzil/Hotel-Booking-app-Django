@@ -1,0 +1,14 @@
+Hello {{ booking.name }},
+
+Your package booking at Deluxe Hotel is confirmed.
+
+Booking reference: {{ booking.reference }}
+Package: {{ booking.package.name }}
+Price: ${{ booking.package.price }} per night
+
+You can view or cancel your booking from the My Bookings page.
+Package bookings can be cancelled free of charge at any time.
+
+We look forward to welcoming you.
+
+Deluxe Hotel
