@@ -41,14 +41,15 @@ class PackageAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ("reference", "guest_name", "room", "start_date", "end_date", "user")
-    list_filter = ("created_at",)
+    list_display = ("reference", "guest_name", "room", "start_date", "end_date", "status", "user")
+    list_filter = ("created_at", "status")
     search_fields = ["guest_name", "phone_number", "reference"]
 
 
 @admin.register(Package_Booking)
 class PackageBookingAdmin(admin.ModelAdmin):
-    list_display = ("reference", "name", "package", "phone_number", "user")
+    list_display = ("reference", "name", "package", "phone_number", "status", "user")
+    list_filter = ("status",)
     search_fields = ["name", "phone_number", "reference"]
 
 

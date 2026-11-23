@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}
+    Change Dates
+{% endblock title %}
+{% block body %}
+    {% include 'hotelbooking/hero.html' with pagename="Change Dates" %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="p-3 my-4 text-center" style="background: #f8f9fa; border: 1px solid #e9ecef;">
+                    <h4 class="mb-1">{{ booking.room.room_name }}</h4>
+                    <p class="mb-1">Booking {{ booking.reference }} — currently {{ booking.start_date }} to {{ booking.end_date }}</p>
+                    <p class="mb-1"><span class="price mr-2">${{ booking.room.room_price }}</span> <span class="per">per night</span></p>
+                    <p class="mb-0" id="stay-total" data-price="{{ booking.room.room_price }}">Pick your new dates to see the total for your stay.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="pb-4 mb-6 mt-3 mb-4 text-center">
+                        <button type="submit" class="btn btn-primary rounded-0 p-6">Save new dates</button>
+                        <a href="{% url 'hotelbooking:my-bookings' %}" class="btn btn-secondary rounded-0 p-6 ml-2">Back to My Bookings</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function () {
+        var totalEl = document.getElementById('stay-total');
+        var price = parseFloat(totalEl.getAttribute('data-price'));
+        var startInput = document.getElementById('id_start_date');
+        var endInput = document.getElementById('id_end_date');
+        function updateTotal() {
+            if (!startInput.value || !endInput.value) {
+                totalEl.textContent = 'Pick your new dates to see the total for your stay.';
+                return;
+            }
+            var nights = Math.round((new Date(endInput.value) - new Date(startInput.value)) / 86400000);
+            if (nights < 1) {
+                totalEl.textContent = 'Check out date must be after check in date.';
+                return;
+            }
+            totalEl.textContent = 'Total for ' + nights + ' night' + (nights === 1 ? '' : 's') + ': $' + (price * nights).toFixed(2);
+        }
+        startInput.addEventListener('change', updateTotal);
+        endInput.addEventListener('change', updateTotal);
+        updateTotal();
+    })();
+    </script>
+{% endblock body %}

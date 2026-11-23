@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from datetime import datetime, date, timedelta
 from django.contrib import messages
 from django.views import View
 from django.views.generic import TemplateView, ListView, CreateView
 from .models import Room, Package, Booking, Room_category, Package_Booking
 from django.db.models import Q
-from .form import BookingForm, PackageBookingForm,ContactForm
+from .form import BookingForm, PackageBookingForm, ContactForm, ChangeDatesForm
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from sslcommerz_lib import SSLCOMMERZ
@@ -30,8 +30,14 @@ class RoomsTemplate(View):
 
         # Get a list of all booked rooms for today and tomorrow
         booked_rooms = Booking.objects.filter(
-            start_date__lte=today, end_date__gt=today
-        ) | Booking.objects.filter(start_date__lt=tomorrow, end_date__gte=tomorrow)
+            start_date__lte=today,
+            end_date__gt=today,
+            status=Booking.STATUS_CONFIRMED,
+        ) | Booking.objects.filter(
+            start_date__lt=tomorrow,
+            end_date__gte=tomorrow,
+            status=Booking.STATUS_CONFIRMED,
+        )
 
         # Get a list of all rooms that are not booked today or tomorrow
         id_list = []
@@ -55,7 +61,8 @@ class RoomsTemplate(View):
             if start_date and end_date:
             # Get rooms that are not booked during the requested period
                 unavailable_rooms = Booking.objects.filter(
-                    Q(start_date__lt=end_date) & Q(end_date__gt=start_date)
+                    Q(start_date__lt=end_date) & Q(end_date__gt=start_date),
+                    status=Booking.STATUS_CONFIRMED,
                 ).values_list('room_id', flat=True)
 
                 available_rooms = Room.objects.exclude(id__in=unavailable_rooms)
@@ -224,6 +231,106 @@ class MyBookingsView(LoginRequiredMixin, TemplateView):
         context["room_bookings"] = room_bookings
         context["package_bookings"] = package_bookings
         return context
+
+
+class CancelRoomBookingView(LoginRequiredMixin, View):
+    def post(self, request, reference):
+        booking = get_object_or_404(
+            Booking, reference=reference, user=request.user
+        )
+        if booking.status == Booking.STATUS_CANCELLED:
+            messages.info(
+                request, f"Booking {booking.reference} is already cancelled."
+            )
+        elif booking.start_date - date.today() < timedelta(days=2):
+            messages.error(
+                request,
+                "This booking can no longer be cancelled online. Free "
+                "cancellation ends 2 days before check-in — please contact us.",
+            )
+        else:
+            booking.status = Booking.STATUS_CANCELLED
+            booking.save()
+            messages.success(
+                request, f"Booking {booking.reference} has been cancelled."
+            )
+        return redirect("hotelbooking:my-bookings")
+
+
+class CancelPackageBookingView(LoginRequiredMixin, View):
+    def post(self, request, reference):
+        booking = get_object_or_404(
+            Package_Booking, reference=reference, user=request.user
+        )
+        if booking.status == Package_Booking.STATUS_CANCELLED:
+            messages.info(
+                request, f"Booking {booking.reference} is already cancelled."
+            )
+        else:
+            booking.status = Package_Booking.STATUS_CANCELLED
+            booking.save()
+            messages.success(
+                request, f"Booking {booking.reference} has been cancelled."
+            )
+        return redirect("hotelbooking:my-bookings")
+
+
+class ChangeBookingDatesView(LoginRequiredMixin, View):
+    def get(self, request, reference):
+        booking = get_object_or_404(
+            Booking, reference=reference, user=request.user
+        )
+        if booking.status != Booking.STATUS_CONFIRMED:
+            messages.error(request, "Only confirmed bookings can be changed.")
+            return redirect("hotelbooking:my-bookings")
+        if booking.start_date <= date.today():
+            messages.error(request, "This stay has already started.")
+            return redirect("hotelbooking:my-bookings")
+        form = ChangeDatesForm(instance=booking)
+        template_name = "hotelbooking/change_dates.html"
+        context = {"form": form, "booking": booking}
+        return render(request, template_name, context)
+
+    def post(self, request, reference):
+        booking = get_object_or_404(
+            Booking, reference=reference, user=request.user
+        )
+        if booking.status != Booking.STATUS_CONFIRMED:
+            messages.error(request, "Only confirmed bookings can be changed.")
+            return redirect("hotelbooking:my-bookings")
+        if booking.start_date <= date.today():
+            messages.error(request, "This stay has already started.")
+            return redirect("hotelbooking:my-bookings")
+        form = ChangeDatesForm(request.POST, instance=booking)
+        if form.is_valid():
+            start_date = form.cleaned_data["start_date"]
+            end_date = form.cleaned_data["end_date"]
+            clash = (
+                Booking.objects.filter(
+                    room=booking.room,
+                    status=Booking.STATUS_CONFIRMED,
+                    start_date__lt=end_date,
+                    end_date__gt=start_date,
+                )
+                .exclude(pk=booking.pk)
+                .exists()
+            )
+            if clash:
+                form.add_error(None, "This room is not available for those dates.")
+            else:
+                form.save()
+                nights = (end_date - start_date).days
+                total = booking.room.room_price * nights
+                messages.success(
+                    request,
+                    f"Booking {booking.reference} moved to {start_date} - "
+                    f"{end_date} ({nights} night"
+                    f"{'s' if nights != 1 else ''}, total ${total}).",
+                )
+                return redirect("hotelbooking:my-bookings")
+        template_name = "hotelbooking/change_dates.html"
+        context = {"form": form, "booking": booking}
+        return render(request, template_name, context)
 
 
 class RestaurantsTemplateView(TemplateView):

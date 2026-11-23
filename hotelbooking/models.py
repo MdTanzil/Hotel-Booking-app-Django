@@ -79,6 +79,13 @@ class Package(BaseModel):
 
 
 class Booking(BaseModel):
+    STATUS_CONFIRMED = "confirmed"
+    STATUS_CANCELLED = "cancelled"
+    STATUS_CHOICES = [
+        (STATUS_CONFIRMED, "Confirmed"),
+        (STATUS_CANCELLED, "Cancelled"),
+    ]
+
     start_date = models.DateField()
     end_date = models.DateField()
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
@@ -92,6 +99,9 @@ class Booking(BaseModel):
         related_name="room_bookings",
     )
     reference = models.CharField(max_length=12, unique=True, null=True, blank=True)
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default=STATUS_CONFIRMED
+    )
 
     def save(self, *args, **kwargs):
         if not self.reference:
@@ -107,6 +117,13 @@ class Booking(BaseModel):
 
 
 class Package_Booking(BaseModel):
+    STATUS_CONFIRMED = "confirmed"
+    STATUS_CANCELLED = "cancelled"
+    STATUS_CHOICES = [
+        (STATUS_CONFIRMED, "Confirmed"),
+        (STATUS_CANCELLED, "Cancelled"),
+    ]
+
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=50)
@@ -118,6 +135,9 @@ class Package_Booking(BaseModel):
         related_name="package_bookings",
     )
     reference = models.CharField(max_length=12, unique=True, null=True, blank=True)
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default=STATUS_CONFIRMED
+    )
 
     def save(self, *args, **kwargs):
         if not self.reference:

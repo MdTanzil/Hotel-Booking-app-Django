@@ -19,7 +19,9 @@
                         <th>Nights</th>
                         <th>Total</th>
                         <th>Guest</th>
+                        <th>Status</th>
                         <th>Booked on</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,7 +34,17 @@
                         <td>{{ booking.nights }}</td>
                         <td>${{ booking.stay_total }}</td>
                         <td>{{ booking.guest_name }}</td>
+                        <td>{{ booking.get_status_display }}</td>
                         <td>{{ booking.created_at|date:"d M Y" }}</td>
+                        <td>
+                            {% if booking.status == "confirmed" %}
+                            <a href="{% url 'hotelbooking:change-booking-dates' booking.reference %}" class="btn btn-sm btn-outline-primary mb-1">Change dates</a>
+                            <form action="{% url 'hotelbooking:cancel-room-booking' booking.reference %}" method="post" class="d-inline" onsubmit="return confirm('Cancel booking {{ booking.reference }}?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger mb-1">Cancel</button>
+                            </form>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -52,7 +64,9 @@
                         <th>Package</th>
                         <th>Price</th>
                         <th>Guest</th>
+                        <th>Status</th>
                         <th>Booked on</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,7 +76,16 @@
                         <td>{{ booking.package.name }}</td>
                         <td>${{ booking.package.price }} per night</td>
                         <td>{{ booking.name }}</td>
+                        <td>{{ booking.get_status_display }}</td>
                         <td>{{ booking.created_at|date:"d M Y" }}</td>
+                        <td>
+                            {% if booking.status == "confirmed" %}
+                            <form action="{% url 'hotelbooking:cancel-package-booking' booking.reference %}" method="post" class="d-inline" onsubmit="return confirm('Cancel booking {{ booking.reference }}?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger mb-1">Cancel</button>
+                            </form>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -75,5 +98,12 @@
         {% if not room_bookings and not package_bookings %}
         <p class="mt-4"><a href="{% url 'hotelbooking:rooms' %}" class="btn btn-primary">Browse Rooms</a></p>
         {% endif %}
+
+        <div class="mt-5 p-4" style="background: #f8f9fa; border: 1px solid #e9ecef;">
+            <h4>Cancellation policy</h4>
+            <p class="mb-1">Room bookings can be cancelled free of charge until 2 days before your check-in date. After that, please contact us directly.</p>
+            <p class="mb-1">You can change the dates of a confirmed booking from this page, as long as the room is available for the new dates.</p>
+            <p class="mb-0">Package bookings can be cancelled free of charge at any time from this page.</p>
+        </div>
     </div>
 {% endblock body %}
