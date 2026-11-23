@@ -6,7 +6,7 @@
                     {% csrf_token %}
                     <div class="row">
                         <!-- Check-in Date -->
-                        <div class="col-md-3 d-flex">
+                        <div class="col-md-2 d-flex">
                             <div class="form-group p-4 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
                                     <label for="checkin_date">Check-in Date</label>
@@ -19,7 +19,7 @@
                             </div>
                         </div>
                         <!-- Check-out Date -->
-                        <div class="col-md-3 d-flex">
+                        <div class="col-md-2 d-flex">
                             <div class="form-group p-4 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
                                     <label for="checkout_date">Check-out Date</label>
@@ -32,7 +32,7 @@
                             </div>
                         </div>
                         <!-- Room Type -->
-                        <div class="col-md d-flex">
+                        <div class="col-md-2 d-flex">
                             <div class="form-group p-4 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
                                     <label for="room_type">Room</label>
@@ -42,12 +42,50 @@
                                                 <span class="ion-ios-arrow-down"></span>
                                             </div>
                                             <select class="form-control" name="room_type" id="room_type">
-                                                <option value="suite">Suite</option>
-                                                <option value="family_room">Family Room</option>
-                                                <option value="deluxe_room">Deluxe Room</option>
-                                                <option value="classic_room">Classic Room</option>
-                                                <option value="superior_room">Superior Room</option>
-                                                <option value="luxury_room">Luxury Room</option>
+                                                <option value="">All room types</option>
+                                                {% for category in room_categories %}
+                                                <option value="{{ category.id }}">{{ category.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Adults -->
+                        <div class="col-md-2 d-flex">
+                            <div class="form-group p-4 align-self-stretch d-flex align-items-end">
+                                <div class="wrap">
+                                    <label for="adults">Adults</label>
+                                    <div class="form-field">
+                                        <div class="select-wrap">
+                                            <div class="icon">
+                                                <span class="ion-ios-arrow-down"></span>
+                                            </div>
+                                            <select class="form-control" name="adults" id="adults">
+                                                {% for n in "123456" %}
+                                                <option value="{{ n }}" {% if adults|stringformat:"s" == n %}selected{% endif %}>{{ n }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Children -->
+                        <div class="col-md-2 d-flex">
+                            <div class="form-group p-4 align-self-stretch d-flex align-items-end">
+                                <div class="wrap">
+                                    <label for="children">Children</label>
+                                    <div class="form-field">
+                                        <div class="select-wrap">
+                                            <div class="icon">
+                                                <span class="ion-ios-arrow-down"></span>
+                                            </div>
+                                            <select class="form-control" name="children" id="children">
+                                                {% for n in "01234" %}
+                                                <option value="{{ n }}" {% if children|stringformat:"s" == n %}selected{% endif %}>{{ n }}</option>
+                                                {% endfor %}
                                             </select>
                                         </div>
                                     </div>
@@ -55,7 +93,7 @@
                             </div>
                         </div>
                         <!-- Submit Button -->
-                        <div class="col-md d-flex">
+                        <div class="col-md-2 d-flex">
                             <div class="form-group d-flex align-self-stretch">
                                 <input type="submit"
                                        value="Check Availability"

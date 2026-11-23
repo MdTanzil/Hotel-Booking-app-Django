@@ -48,6 +48,9 @@ class HomeTemplate(TemplateView):
             Review.objects.select_related("room")
             .order_by("-created_at", "-id")[:5]
         )
+        context["room_categories"] = Room_category.objects.all()
+        context["adults"] = 2
+        context["children"] = 0
         return context
 
 
@@ -76,47 +79,85 @@ class RoomsTemplate(View):
         available_rooms = Room.objects.exclude(id__in=id_list).filter(active=True)
         all_rooms = Room.objects.all().filter(active=True)
         template_name = "hotelbooking/rooms.html"
-        context = {"rooms": available_rooms, "all_rooms": all_rooms}
+        context = {
+            "rooms": available_rooms,
+            "all_rooms": all_rooms,
+            "room_categories": Room_category.objects.all(),
+            "adults": 2,
+            "children": 0,
+        }
         return render(request, template_name, context)
 
     def post(self, request):
-        template_name = "hotelbooking/rooms.html"
-        context = {}
+        start_date = request.POST.get("start_date")
+        end_date = request.POST.get("end_date")
+        if not start_date or not end_date:
+            messages.error(
+                request, "Please choose your check-in and check-out dates."
+            )
+            return redirect("hotelbooking:rooms")
         try:
-            start_date = request.POST.get("start_date")
-            end_date = request.POST.get("end_date")
-            room_type = request.POST.get("room_type")
-            print("coming here...", start_date, end_date)
-            
-            if start_date and end_date:
-            # Get rooms that are not booked during the requested period
-                unavailable_rooms = Booking.objects.filter(
-                    Q(start_date__lt=end_date) & Q(end_date__gt=start_date),
-                    status=Booking.STATUS_CONFIRMED,
-                ).values_list('room_id', flat=True)
+            start = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except ValueError:
+            messages.error(request, "Please choose valid dates.")
+            return redirect("hotelbooking:rooms")
+        nights = (end - start).days
+        if nights < 1:
+            messages.error(
+                request, "Check-out date must be after check-in date."
+            )
+            return redirect("hotelbooking:rooms")
 
-                available_rooms = Room.objects.exclude(id__in=unavailable_rooms)
-                try:
-                    nights = (
-                        datetime.strptime(end_date, "%Y-%m-%d").date()
-                        - datetime.strptime(start_date, "%Y-%m-%d").date()
-                    ).days
-                except ValueError:
-                    nights = None
-                if nights is not None and nights < 1:
-                    nights = None
-                if nights:
-                    for room in available_rooms:
-                        room.stay_total = room.room_price * nights
-                context = {
-                    "rooms": available_rooms,
-                    "start_date": start_date,
-                    "end_date": end_date,
-                    "nights": nights,
-                }
-                return render(request, 'hotelbooking/searchroom.html', context)
-        except:
-            return render(request, template_name)
+        try:
+            adults = max(1, min(6, int(request.POST.get("adults", 2))))
+        except (TypeError, ValueError):
+            adults = 2
+        try:
+            children = max(0, min(4, int(request.POST.get("children", 0))))
+        except (TypeError, ValueError):
+            children = 0
+        guests = adults + children
+
+        room_type = request.POST.get("room_type") or ""
+        room_type_name = ""
+        try:
+            room_type_id = int(room_type) if room_type else None
+        except ValueError:
+            room_type_id = None
+        if room_type_id:
+            category = Room_category.objects.filter(pk=room_type_id).first()
+            if category:
+                room_type_name = category.name
+            else:
+                room_type_id = None
+
+        # Rooms that are not booked during the requested period.
+        unavailable_rooms = Booking.objects.filter(
+            Q(start_date__lt=end_date) & Q(end_date__gt=start_date),
+            status=Booking.STATUS_CONFIRMED,
+        ).values_list("room_id", flat=True)
+        available_rooms = Room.objects.exclude(id__in=unavailable_rooms).filter(
+            active=True, max_person__gte=guests
+        )
+        if room_type_id:
+            available_rooms = available_rooms.filter(
+                room_category_id=room_type_id
+            )
+        for room in available_rooms:
+            room.stay_total = room.room_price * nights
+        context = {
+            "rooms": available_rooms,
+            "start_date": start_date,
+            "end_date": end_date,
+            "nights": nights,
+            "adults": adults,
+            "children": children,
+            "room_type": room_type,
+            "room_type_name": room_type_name,
+            "room_categories": Room_category.objects.all(),
+        }
+        return render(request, "hotelbooking/searchroom.html", context)
 
 
 class PackageTemplate(ListView):

@@ -17,11 +17,36 @@
                 <label for="#">Check-out Date</label>
 
                 <input type="date"
-                       id="checkin_date"
+                       id="checkout_date"
                        name="end_date"
                        {% if end_date %}value = '{{ end_date }}'{% endif %}
                        class="form-control"
                        placeholder="Check Out Date">
+            </div>
+            <div class="form-group">
+                <label for="#">Room type</label>
+                <select name="room_type" class="form-control">
+                    <option value="">All room types</option>
+                    {% for category in room_categories %}
+                    <option value="{{ category.id }}" {% if room_type|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="#">Adults</label>
+                <select name="adults" class="form-control">
+                    {% for n in "123456" %}
+                    <option value="{{ n }}" {% if adults|stringformat:"s" == n %}selected{% endif %}>{{ n }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="#">Children</label>
+                <select name="children" class="form-control">
+                    {% for n in "01234" %}
+                    <option value="{{ n }}" {% if children|stringformat:"s" == n %}selected{% endif %}>{{ n }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Search" class="btn btn-primary py-3 px-5">
