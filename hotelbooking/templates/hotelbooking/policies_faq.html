@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block title %}
+  Policies &amp; FAQ
+{% endblock title %}
+{% block body %}
+  {% include 'hotelbooking/hero.html' with pagename="Policies & FAQ" %}
+  <section class="ftco-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+
+          <h2 class="mb-4">Our policies</h2>
+
+          <h4 class="mt-4">Cancellation policy</h4>
+          <p>Room bookings can be cancelled free of charge until 2 days before your check-in date. After that, please contact us directly and we will do our best to help.</p>
+          <p>Package bookings can be cancelled free of charge at any time. You can cancel any booking yourself from the <a href="{% url 'hotelbooking:my-bookings' %}">My Bookings</a> page — no phone call needed.</p>
+
+          <h4 class="mt-4">Changing your dates</h4>
+          <p>You can change the dates of a confirmed room booking from the My Bookings page, as long as the room is available for the new dates. If the new stay costs more or less, the total shown at checkout is the price you pay.</p>
+
+          <h4 class="mt-4">Payment policy</h4>
+          <p>Your booking is confirmed as soon as you place it — no prepayment is required. You can pay at the hotel when you arrive. Where online payment is available, you can also pay in advance by card from the My Bookings page.</p>
+
+          <h4 class="mt-4">Check-in &amp; check-out</h4>
+          <p>Check-in is from 2:00 PM and check-out is by 12:00 PM. Arriving late? Let us know in advance and we will keep your room ready. Please bring a valid photo ID or passport at check-in.</p>
+
+          <h4 class="mt-4">House rules</h4>
+          <p>Smoking is not allowed inside the rooms. Pets are welcome on request — please contact us before you arrive. Quiet hours are 10:00 PM to 7:00 AM. Each room has a maximum number of guests, shown on the room page; children under 12 stay free in the existing bedding.</p>
+
+          <h2 class="mb-4 mt-5">Frequently asked questions</h2>
+
+          <h5>Do I need an account to book?</h5>
+          <p>Yes — booking requires a free account, so your bookings, references and payment status are all in one place on the My Bookings page. On this demo site you can sign in instantly with one of the demo accounts shown on the login page.</p>
+
+          <h5>How do I know my booking is confirmed?</h5>
+          <p>After booking you see a confirmation message with your booking reference (for example HB-XXXXXX). Your booking also appears on the My Bookings page, and a confirmation email is sent when email is set up.</p>
+
+          <h5>How do I change my dates or cancel?</h5>
+          <p>Sign in and open My Bookings. Each confirmed booking has Change dates and Cancel buttons. Date changes are confirmed straight away if the room is free for the new dates.</p>
+
+          <h5>How do I pay for my stay?</h5>
+          <p>You can pay at the hotel on arrival. If online payment is enabled, a Pay now button appears next to each unpaid booking on the My Bookings page and takes you to a secure checkout.</p>
+
+          <h5>Is breakfast included?</h5>
+          <p>Rooms are room-only unless stated otherwise. Packages that list breakfast include it — check the package details before booking.</p>
+
+          <h5>Can I get a receipt or invoice?</h5>
+          <p>Yes — ask at reception during your stay, or <a href="{% url 'hotelbooking:contact-us' %}">contact us</a> afterwards with your booking reference.</p>
+
+          <p class="mt-5">Still have a question? <a href="{% url 'hotelbooking:contact-us' %}">Contact us</a> and we will get back to you.</p>
+
+        </div>
+      </div>
+    </div>
+  </section>
+  {% include 'footer.html' %}
+{% endblock body %}

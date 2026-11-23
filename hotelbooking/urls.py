@@ -16,6 +16,7 @@ from .views import (
     StripeWebhookView,
     AddReviewView,
     DeleteReviewView,
+    PoliciesFaqView,
     RestaurantsTemplateView,
     AboutUsTemplateView,
     BlogTemplateView,
@@ -81,6 +82,7 @@ urlpatterns = [
     path('restaurants/', RestaurantsTemplateView.as_view(),name='restaurants_home'),
     path('about-us/', AboutUsTemplateView.as_view(),name='about-us'),
     path('blog/', BlogTemplateView.as_view(),name='blog'),
+    path('policies/', PoliciesFaqView.as_view(), name='policies-faq'),
     path('contact/', ContactFormView.as_view(),name='contact-us'),
     
     

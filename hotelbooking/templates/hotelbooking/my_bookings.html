@@ -114,6 +114,7 @@
             <p class="mb-1">Room bookings can be cancelled free of charge until 2 days before your check-in date. After that, please contact us directly.</p>
             <p class="mb-1">You can change the dates of a confirmed booking from this page, as long as the room is available for the new dates.</p>
             <p class="mb-0">Package bookings can be cancelled free of charge at any time from this page.</p>
+            <p class="mb-0 mt-2"><a href="{% url 'hotelbooking:policies-faq' %}">See our full policies and FAQ</a></p>
             {% if not stripe_configured %}
             <p class="mb-0 mt-2">Online payment is not set up yet — please pay at the hotel.</p>
             {% endif %}

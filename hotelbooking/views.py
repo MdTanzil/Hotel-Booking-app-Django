@@ -222,6 +222,10 @@ class DeleteReviewView(LoginRequiredMixin, View):
         return redirect("hotelbooking:details-room", pk=room_pk)
 
 
+class PoliciesFaqView(TemplateView):
+    template_name = "hotelbooking/policies_faq.html"
+
+
 class CreateBookingRoom(LoginRequiredMixin, View):
     def get(self, request, pk):
         room = Room.objects.get(id=pk)
