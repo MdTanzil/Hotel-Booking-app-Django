@@ -6,8 +6,8 @@
                     {% csrf_token %}
                     <div class="row">
                         <!-- Check-in Date -->
-                        <div class="col-md-2 d-flex">
-                            <div class="form-group p-4 align-self-stretch d-flex align-items-end">
+                        <div class="col-lg-2 d-flex">
+                            <div class="form-group p-3 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
                                     <label for="checkin_date">Check-in</label>
                                     <input type="date"
@@ -19,8 +19,8 @@
                             </div>
                         </div>
                         <!-- Check-out Date -->
-                        <div class="col-md-2 d-flex">
-                            <div class="form-group p-4 align-self-stretch d-flex align-items-end">
+                        <div class="col-lg-2 d-flex">
+                            <div class="form-group p-3 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
                                     <label for="checkout_date">Check-out</label>
                                     <input type="date"
@@ -32,8 +32,8 @@
                             </div>
                         </div>
                         <!-- Room Type -->
-                        <div class="col-md-3 d-flex">
-                            <div class="form-group p-4 align-self-stretch d-flex align-items-end">
+                        <div class="col-lg-3 d-flex">
+                            <div class="form-group p-3 align-self-stretch d-flex align-items-end">
                                 <div class="wrap">
                                     <label for="room_type">Room</label>
                                     <div class="form-field">
@@ -42,7 +42,7 @@
                                                 <span class="ion-ios-arrow-down"></span>
                                             </div>
                                             <select class="form-control" name="room_type" id="room_type">
-                                                <option value="">All room types</option>
+                                                <option value="">All rooms</option>
                                                 {% for category in room_categories %}
                                                 <option value="{{ category.id }}">{{ category.name }}</option>
                                                 {% endfor %}
@@ -53,8 +53,8 @@
                             </div>
                         </div>
                         <!-- Guests -->
-                        <div class="col-md-2 d-flex">
-                            <div class="form-group p-4 align-self-stretch d-flex align-items-end">
+                        <div class="col-lg-2 d-flex">
+                            <div class="form-group p-3 align-self-stretch d-flex align-items-end">
                                 <div class="wrap w-100">
                                     <label>Guests</label>
                                     <div class="row">
@@ -93,7 +93,7 @@
                             </div>
                         </div>
                         <!-- Submit Button -->
-                        <div class="col-md-3 d-flex">
+                        <div class="col-lg-3 d-flex">
                             <div class="form-group d-flex align-self-stretch">
                                 <input type="submit"
                                        value="Check Availability"
@@ -106,6 +106,10 @@
         </div>
     </div>
 </section>
+<style>
+  /* Keep the date fields compact so they fit their column. */
+  .booking-form input[type="date"] { font-size: 14px; }
+</style>
 <script>
 (function () {
     // Clicking a date field opens the calendar picker, and past dates
